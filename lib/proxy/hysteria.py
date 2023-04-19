@@ -29,11 +29,10 @@ def prompt_hysteria_obfs():
     print(
         """
 [Optional | Recommended] Enter a random string to use as the obfuscation password
-for Hysteria packets. Leaving this blank, will DISABLE the obfuscation and your traffic
-will be known as normal QUIC traffic.
+for Hysteria packets. Leaving this blank, will DISABLE the obfuscation and your traffic will be known as normal QUIC traffic.
 
 NOTE: If you're trying to closely match the QUIC traffic characteristics
-it's better to use the port 443/udp and the 'h3' ALPN as they
+it's better to leave this blank and use the port 443/udp and the 'h3' ALPN as they
 are the official specs for QUIC traffic.
         """
     )
