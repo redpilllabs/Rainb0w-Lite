@@ -67,8 +67,8 @@ IP=$(curl -s ifconfig.me | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
 if [ -n "$IP" ]; then
     echo -e "${B_GREEN}>> Allow Local Gateway ${RESET}"
     C_CLASS=$(echo $IP | cut -d '.' -f1-3)
-    CIDR="$C_CLASS.0/32"
-    GATEWAY="$C_CLASS.255"
+    CIDR="${C_CLASS}.0/32"
+    GATEWAY="${C_CLASS}.255"
     iptables -A INPUT -s $CIDR -d $GATEWAY -m conntrack --ctstate NEW -m comment --comment "Allow Local Gateway" -j ACCEPT
 fi
 
