@@ -1,0 +1,15 @@
+{
+    "listen": ":8443",
+    "protocol": "udp",
+    "cert": "/etc/ssl/certs/selfsigned.crt",
+    "key": "/etc/ssl/private/selfsigned.key",
+    "resolver": "udp://172.18.0.53:53",
+    "resolve_preference": "46",
+    "recv_window_conn": 1677768,
+    "recv_window_client": 4194304,
+    "disable_mtu_discovery": true,
+    "auth": {
+        "mode": "passwords",
+        "config": []
+    }
+}

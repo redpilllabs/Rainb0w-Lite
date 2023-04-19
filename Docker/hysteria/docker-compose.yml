@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  hysteria:
+    image: tobyxdd/hysteria:latest
+    container_name: hysteria
+    restart: always
+    networks:
+      - proxy
+    ports:
+      - "8443:8443/udp"
+    volumes:
+      - /etc/ssl/certs/selfsigned.crt:/etc/ssl/certs/selfsigned.crt:ro
+      - /etc/ssl/private/selfsigned.key:/etc/ssl/private/selfsigned.key:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./etc/hysteria.json:/etc/hysteria.json
+    environment:
+      - LOGGING_LEVEL=error
+    command: [ "server", "--config", "/etc/hysteria.json" ]
+
+networks:
+  proxy:
+    external: true

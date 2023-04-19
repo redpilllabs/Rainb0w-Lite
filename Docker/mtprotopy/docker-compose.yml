@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  mtproto:
+    container_name: mtproto
+    image: mtprotopy
+    restart: always
+    networks:
+      - proxy
+    ports:
+      - "993:933"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./etc/config.toml:/config/config.toml:ro
+      - $HOME/Rainb0w_Lite_Home/rainb0w_users.toml:/config/users.toml:rw
+
+networks:
+  proxy:
+    external: true

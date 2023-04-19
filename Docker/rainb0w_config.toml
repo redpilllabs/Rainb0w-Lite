@@ -1,0 +1,23 @@
+# Rainb0w Lite config file
+[CERT]
+# This domain must be an accessible and well-known domain
+# also any active probing will be redirected there.
+FAKE_SNI = ""
+# This should resemble a valid organization name for the above domain
+ORGANIZATION = ""
+
+[REALITY]
+# REALITY Port (TCP)
+PORT = 443
+PRIVATE_KEY = ""
+PUBLIC_KEY = ""
+
+[HYSTERIA]
+# Hysteria Port (UDP)
+PORT = 443
+ALPN = ""
+OBFS = ""
+
+[MTPROTO]
+# MTPRoto Port (TCP)
+PORT = 993
