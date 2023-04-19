@@ -69,7 +69,7 @@ if [ -n "$IP" ]; then
     C_CLASS=$(echo $IP | cut -d '.' -f1-3)
     CIDR="${C_CLASS}.0/32"
     GATEWAY="${C_CLASS}.255"
-    iptables -A INPUT -s $CIDR -d $GATEWAY -m conntrack --ctstate NEW -m comment --comment "Allow Local Gateway" -j ACCEPT
+    iptables -A INPUT -s $CIDR -d $GATEWAY -m comment --comment "Allow Local Gateway" -j ACCEPT
 fi
 
 echo -e "${B_GREEN}>> Allow incoming and outgoing SSH ${RESET}"
