@@ -12,6 +12,5 @@ config_file_handle = open(
 rainb0w_config = toml.load(config_file_handle)
 
 print(rainb0w_config["CERT"]["FAKE_SNI"])
-print(rainb0w_config["CERT"]["ORGANIZATION"])
 
 config_file_handle.close()

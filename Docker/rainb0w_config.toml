@@ -3,8 +3,6 @@
 # This domain must be an accessible and well-known domain
 # also any active probing will be redirected there.
 FAKE_SNI = ""
-# This should resemble a valid organization name for the above domain
-ORGANIZATION = ""
 
 [REALITY]
 # REALITY Port (TCP)

@@ -48,28 +48,3 @@ Good examples include (but are not limited to):
         fake_sni = input("Enter a fake SNI: ")
 
     return fake_sni
-
-
-def prompt_organization_name() -> str:
-    print(
-        """
-Enter a organization name that is related to the fake SNI you provided earlier.
-For example if you entered a *.google.com as your SNI, you should
-enter 'Google Trust Services LLC' here.
-
-Here's a brief list of wellknown names:
-    - *.google.com -> Google Trust Services LLC
-    - *.apple.com -> Apple Inc.
-    - *.icloud.com -> Apple Inc.
-    - *.github.com -> GitHub, Inc.
-    - *.nvidia.com -> Nvidia Corporation
-"""
-    )
-    org_name = input("\nEnter a related organization name: ")
-    while not org_name:
-        print(
-            "\nInvalid domain name! Please enter an organization name related to your fake SNI."
-        )
-        org_name = input("Enter a related organization name: ")
-
-    return org_name

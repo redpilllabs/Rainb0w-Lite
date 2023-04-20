@@ -24,7 +24,7 @@ from proxy.hysteria import (
 from proxy.mtproto import configure_mtproto
 from proxy.xray import configure_xray_reality
 from user.user_manager import add_user_to_proxies, create_new_user, prompt_username
-from utils.cert_utils import prompt_fake_sni, prompt_organization_name
+from utils.cert_utils import prompt_fake_sni
 from utils.helper import copy_dir, copy_file, load_toml, progress_indicator, save_toml
 from utils.net_utils import prompt_port_number
 
@@ -104,39 +104,36 @@ def configure():
     tcp_ports = set()
     udp_ports = set()
 
-    progress_indicator(1, 8, "Fake SNI")
+    progress_indicator(1, 7, "Fake SNI")
     rainb0w_config["CERT"]["FAKE_SNI"] = prompt_fake_sni()
 
-    progress_indicator(2, 8, "Organization Name")
-    rainb0w_config["CERT"]["ORGANIZATION"] = prompt_organization_name()
-
-    progress_indicator(3, 8, "REALITY Port")
+    progress_indicator(2, 7, "REALITY Port")
     rainb0w_config["REALITY"]["PORT"], tcp_ports = prompt_port_number(
         "REALITY", "TCP", tcp_ports
     )
 
-    progress_indicator(4, 8, "MTProto Port")
+    progress_indicator(3, 7, "MTProto Port")
     rainb0w_config["MTPROTO"]["PORT"], tcp_ports = prompt_port_number(
         "MTProto", "TCP", tcp_ports
     )
 
-    progress_indicator(5, 8, "Hysteria Port")
+    progress_indicator(4, 7, "Hysteria Port")
     rainb0w_config["HYSTERIA"]["PORT"], udp_ports = prompt_port_number(
         "Hysteria", "UDP", udp_ports
     )
 
-    progress_indicator(6, 8, "Hysteria Obfuscation")
+    progress_indicator(5, 7, "Hysteria Obfuscation")
     obfs = prompt_hysteria_obfs()
     if obfs:
         rainb0w_config["HYSTERIA"]["OBFS"] = obfs
 
-    progress_indicator(7, 8, "Hysteria ALPN")
+    progress_indicator(6, 7, "Hysteria ALPN")
     alpn = prompt_hysteria_alpn()
     if alpn:
         rainb0w_config["HYSTERIA"]["ALPN"] = alpn
 
     # Finally prompt for a username
-    progress_indicator(8, 8, "User Management")
+    progress_indicator(7, 7, "User Management")
     username = prompt_username()
 
     # Save the configuration to file because we're going to pass it around next

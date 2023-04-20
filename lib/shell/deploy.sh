@@ -42,15 +42,13 @@ source $PWD/lib/shell/os/disable_dns_stub_listener.sh
 # Generate a self-signed x509 certificate
 output=$(python3 $PWD/lib/shell/helper/get_cert_info.py)
 common_name=$(echo $output | awk -F'[ :]' '{print $1}')
-organization=$(echo $output | awk -F'[ :]' '{print $2}')
-source $PWD/lib/shell/cryptography/gen_x509_cert.sh ${common_name} ${organization}
+source $PWD/lib/shell/cryptography/gen_x509_cert.sh ${common_name}
 
 # Add cronjob to renew the cert once a year
 if ! crontab -l | grep -q "0 1 * * * root bash /usr/libexec/rainb0w/renew_selfsigned_cert.sh >/tmp/renew_certs.log"; then
     echo -e "${B_GREEN}>> Adding cronjob to renew the selfsigned cert every year ${RESET}"
     cp $PWD/lib/shell/cronjobs/renew_selfsigned_cert.sh /usr/libexec/rainb0w/renew_selfsigned_cert.sh
     sed -i 's/COMMON_NAME=.*/COMMON_NAME="'"$common_name"'"/g' /usr/libexec/rainb0w/renew_selfsigned_cert.sh
-    sed -i 's/ORGANIZATION=.*/ORGANIZATION="'"$organization"'"/g' /usr/libexec/rainb0w/renew_selfsigned_cert.sh
     chmod +x /usr/libexec/rainb0w/renew_selfsigned_cert.sh
     (
         crontab -l
