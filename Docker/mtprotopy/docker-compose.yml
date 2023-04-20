@@ -1,7 +1,7 @@
 version: "3.9"
 services:
-  mtproto:
-    container_name: mtproto
+  mtprotopy:
+    container_name: mtprotopy
     image: mtprotopy
     restart: always
     networks:
