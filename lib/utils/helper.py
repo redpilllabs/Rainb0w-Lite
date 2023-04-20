@@ -82,16 +82,14 @@ def print_typewriter(text: str):
         time.sleep(random.uniform(0.05, 0.15))
 
 
-def print_txt_file(txt_file: str):
-    with open(txt_file, "r") as file:
-        text = file.read()
-        print(text)
-
-
 def load_txt_file(txt_file: str):
     with open(txt_file, "r") as file:
         text = file.read()
         return text
+
+
+def print_txt_file(txt_file: str):
+    print(load_txt_file(txt_file))
 
 
 def write_txt_file(data, txt_file: str):
