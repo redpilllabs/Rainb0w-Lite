@@ -3,7 +3,7 @@ import os
 from utils.helper import get_public_ip
 
 # General
-VERSION = "1.1"
+VERSION = "1.2"
 
 # Server info
 PUBLIC_IP = get_public_ip()

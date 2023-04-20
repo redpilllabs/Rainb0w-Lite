@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.2
+
+- Pull pre-built MTProto Docker image from Docker Hub
+- Minor bugfixes and cleanup
+
 ## Version 1.1
 
 - Add QR code generation
