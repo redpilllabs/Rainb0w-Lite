@@ -71,6 +71,10 @@ def configure_xray_reality(
         xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
             "serverNames"
         ].append(f"www.{main_domain}")
+    else:
+        xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
+            "serverNames"
+        ].append(f"www.{cert_config['FAKE_SNI']}")
 
     save_json(xray_config, xray_config_file)
     save_yaml(xray_docker_compose, xray_docker_compose_file)
