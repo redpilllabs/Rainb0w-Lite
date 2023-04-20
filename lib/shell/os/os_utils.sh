@@ -23,5 +23,6 @@ function fn_install_python_packages() {
     fn_check_and_install_pkg curl
     fn_check_and_install_pkg unzip
     fn_check_and_install_pkg python3-pip
+    fn_check_and_install_pkg qrencode
     pip3 install --quiet -r $PWD/requirements.txt
 }
