@@ -4,6 +4,7 @@ import os
 import random
 import shutil
 import string
+import subprocess
 import time
 
 import bcrypt
@@ -87,6 +88,17 @@ def print_txt_file(txt_file: str):
         print(text)
 
 
+def load_txt_file(txt_file: str):
+    with open(txt_file, "r") as file:
+        text = file.read()
+        return text
+
+
+def write_txt_file(data, txt_file: str):
+    with open(txt_file, "w") as f:
+        f.write(data)
+
+
 def gen_random_string(length: int):
     characters = string.ascii_letters + string.digits
     return "".join(random.choices(characters, k=length))
@@ -148,3 +160,15 @@ def remove_dir(path):
 
 def remove_file(path):
     os.remove(path)
+
+
+def gen_qrcode(data):
+    command = "qrencode -t ansiutf8 " + data
+    process = subprocess.run(command.split(), stdout=subprocess.PIPE)
+    print(process.stdout.decode("utf-8"))
+
+
+def save_qrcode(data, output_path: str):
+    command = "qrencode -t PNG32 -s 4 " + data + " -o " + output_path
+    process = subprocess.run(command.split(), stdout=subprocess.PIPE)
+    print(process.stdout.decode("utf-8"))

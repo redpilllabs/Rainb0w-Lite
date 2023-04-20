@@ -10,6 +10,7 @@ from utils.helper import (
     load_yaml,
     save_json,
     save_yaml,
+    write_txt_file,
 )
 
 
@@ -47,7 +48,7 @@ are the official specs for QUIC traffic.
         """
     )
     choice = input("\nGenerate a secure password for obfs? [Y/n] ")
-    if choice in ["y", "Y", "Yes", "YES"]:
+    if choice in ["", "y", "Y", "Yes", "YES"]:
         obfs = gen_random_string(random.randint(8, 12))
         print(f"Generated secure obfs password: {obfs}")
         sleep(1)
@@ -110,58 +111,17 @@ def configure_hysteria_client(user_info: dict, proxy_config: dict, cert_config: 
         client_config["alpn"] = proxy_config["ALPN"]
 
     save_json(
-        client_config, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}-hysteria.json"
+        client_config, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria.json"
     )
-
-
-def print_hysteria_client_info(user_info: dict, proxy_config: dict, cert_config: dict):
-    from base.config import PUBLIC_IP
 
     auth_base64 = bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))
     auth_base64 = auth_base64.replace("=", "%3D")
 
     if {proxy_config["OBFS"]}:
-        return f"""
-    *********************** HYSTERIA ***********************
-
-    hysteria://{PUBLIC_IP}:{proxy_config['PORT']}/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}+Hysteria
-
-    If your client does not support share links, configure it as the following:
-
-    Server:             {PUBLIC_IP}
-    Port:               {proxy_config['PORT']}
-    Protocol:           UDP
-    SNI:                {cert_config['FAKE_SNI']}
-    ALPN:               {proxy_config['ALPN']}
-    Obfuscation:        {proxy_config['OBFS']}
-    Auth. Type:         BASE64
-    Payload:            {bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))}
-    Allow Insecure:     Enabled
-    Max Upload:         YOUR REAL UPLOAD SPEED
-    Max Download:       YOUR REAL DOWNLOAD SPEED
-    QUIC Stream:        1677768
-    QUIC Conn.:         4194304
-    Disable Path MTU Discovery: Enabled
-        """
+        share_url = f"hysteria://{PUBLIC_IP}:{proxy_config['PORT']}/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}+Hysteria"
     else:
-        return f"""
-    *********************** HYSTERIA ***********************
+        share_url = f"hysteria://{PUBLIC_IP}:{proxy_config['PORT']}/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}#{user_info['name']}+Hysteria"
 
-    hysteria://{PUBLIC_IP}:{proxy_config['PORT']}/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}#{user_info['name']}+Hysteria
-
-    If your client does not support share links, configure it as the following:
-
-    Server:             {PUBLIC_IP}
-    Port:               {proxy_config['PORT']}
-    Protocol:           UDP
-    SNI:                {cert_config['FAKE_SNI']}
-    ALPN:               {proxy_config['ALPN']}
-    Auth. Type:         BASE64
-    Payload:            {bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))}
-    Allow Insecure:     Enabled
-    Max Upload:         YOUR REAL UPLOAD SPEED
-    Max Download:       YOUR REAL DOWNLOAD SPEED
-    QUIC Stream:        1677768
-    QUIC Conn.:         4194304
-    Disable Path MTU Discovery: Enabled
-    """
+    write_txt_file(
+        share_url, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"
+    )

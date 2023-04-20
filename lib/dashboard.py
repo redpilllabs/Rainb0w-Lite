@@ -92,13 +92,13 @@ def user_info_menu(user: str):
 
     title = f"Select any option for {user}:"
     options = [
-        "View Share URLs",
+        "View QR codes and share URLs",
         "Remove User",
         "Back to Users Management Menu",
     ]
     option, _ = pick(options, title)
-    if option == "View Share URLs":
-        print_client_info(user, RAINB0W_USERS_FILE)
+    if option == "View QR codes and share URLs":
+        print_client_info(user, RAINB0W_USERS_FILE, RAINB0W_CONFIG_FILE)
         prompt_clear_screen()
     elif option == "Remove User":
         title = f"Confirm removing '{user}'?"

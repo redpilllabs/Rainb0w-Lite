@@ -1,12 +1,10 @@
-import os
-
 from base.config import (
     CLIENT_CONFIG_FILES_DIR,
     PUBLIC_IP,
     XRAY_CLIENT_TEMPLATE_CONFIG_FILE,
 )
 from utils.cert_utils import extract_domain, is_subdomain
-from utils.helper import load_json, load_yaml, remove_file, save_json, save_yaml
+from utils.helper import load_json, load_yaml, save_json, save_yaml, write_txt_file
 
 
 def xray_add_user(user_info: dict, xray_config_file: str):
@@ -81,8 +79,6 @@ def configure_xray_reality(
 def configure_xray_reality_client(
     user_info: dict, proxy_config: dict, cert_config: dict
 ):
-    if os.path.exists(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}"):
-        remove_file(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}")
     client_config = load_json(XRAY_CLIENT_TEMPLATE_CONFIG_FILE)
 
     client_config["outbounds"][0]["settings"]["vnext"][0]["address"] = PUBLIC_IP
@@ -106,16 +102,10 @@ def configure_xray_reality_client(
         "shortId"
     ] = user_info["short_id"]
 
-    save_json(
-        client_config, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}-reality.json"
+    share_url = f"vless://{user_info['uuid']}@{PUBLIC_IP}:{proxy_config['PORT']}?security=reality&encryption=none&pbk={proxy_config['PUBLIC_KEY']}&headerType=none&fp=chrome&spx=%2F&type=tcp&flow=xtls-rprx-vision-udp443&sni={cert_config['FAKE_SNI']}&sid={user_info['short_id']}#{user_info['name']}+REALITY"
+    write_txt_file(
+        share_url, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-url.txt"
     )
-
-
-def print_reality_share_link(user_info: dict, proxy_config: dict, cert_config: dict):
-    from base.config import PUBLIC_IP
-
-    return f"""
-*********************** XRAY REALITY ***********************
-
-vless://{user_info['uuid']}@{PUBLIC_IP}:{proxy_config['PORT']}?security=reality&encryption=none&pbk={proxy_config['PUBLIC_KEY']}&headerType=none&fp=chrome&spx=%2F&type=tcp&flow=xtls-rprx-vision-udp443&sni={cert_config['FAKE_SNI']}&sid={user_info['short_id']}#{user_info['name']}+REALITY\n
-    """
+    save_json(
+        client_config, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality.json"
+    )

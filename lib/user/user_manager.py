@@ -1,29 +1,28 @@
+import base64
 import os
 import random
 from os import urandom
 from random import randint
 from uuid import uuid4
 
-from base.config import CLIENT_CONFIG_FILES_DIR
+from base.config import CLIENT_CONFIG_FILES_DIR, PUBLIC_IP
 from proxy.hysteria import (
     configure_hysteria_client,
     hysteria_add_user,
     hysteria_remove_user,
-    print_hysteria_client_info,
 )
-from proxy.mtproto import print_mtproto_share_links
-from proxy.xray import (
-    configure_xray_reality_client,
-    print_reality_share_link,
-    xray_add_user,
-    xray_remove_user,
-)
+from proxy.mtproto import configure_mtproto_client
+from proxy.xray import configure_xray_reality_client, xray_add_user, xray_remove_user
 from rich import print
 from utils.helper import (
+    bytes_to_raw_str,
+    gen_qrcode,
     gen_random_string,
     load_toml,
+    load_txt_file,
     print_txt_file,
-    remove_file,
+    remove_dir,
+    save_qrcode,
     save_toml,
 )
 
@@ -70,6 +69,9 @@ def add_user_to_proxies(
 ):
     rainb0w_config = load_toml(rainb0w_config_file)
 
+    if not os.path.exists(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}"):
+        os.makedirs(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}")
+
     # Add user to proxies (MTProto is directly loaded from the users.toml file)
     xray_add_user(user_info, xray_config_file)
     hysteria_add_user(user_info, hysteria_config_file)
@@ -80,26 +82,29 @@ def add_user_to_proxies(
     configure_xray_reality_client(
         user_info, rainb0w_config["REALITY"], rainb0w_config["CERT"]
     )
+    save_qrcode(
+        load_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-url.txt"),
+        f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-qrcode.png",
+    )
     configure_hysteria_client(
         user_info, rainb0w_config["HYSTERIA"], rainb0w_config["CERT"]
     )
-
-    with open(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}.txt", "w") as file:
-        file.write(
-            print_reality_share_link(
-                user_info, rainb0w_config["REALITY"], rainb0w_config["CERT"]
-            )
-        )
-        file.write(
-            print_mtproto_share_links(
-                user_info, rainb0w_config["MTPROTO"], rainb0w_config["CERT"]
-            )
-        )
-        file.write(
-            print_hysteria_client_info(
-                user_info, rainb0w_config["HYSTERIA"], rainb0w_config["CERT"]
-            )
-        )
+    save_qrcode(
+        load_txt_file(
+            f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"
+        ),
+        f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}hysteria-qrcode.png",
+    )
+    configure_mtproto_client(
+        user_info,
+        rainb0w_config["MTPROTO"],
+        rainb0w_config["CERT"],
+        base64_encode=False,
+    )
+    save_qrcode(
+        load_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-url.txt"),
+        f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-qrcode.png",
+    )
 
     rainb0w_users = get_users(rainb0w_users_file)
     rainb0w_users.append(user_info)
@@ -119,33 +124,81 @@ def remove_user(
                 print(f"Removing the user '{username}'...")
                 xray_remove_user(user, xray_config_file)
                 hysteria_remove_user(user, hysteria_config_file)
-                remove_file(f"{CLIENT_CONFIG_FILES_DIR}/{user['name']}-reality.json")
-                remove_file(f"{CLIENT_CONFIG_FILES_DIR}/{user['name']}-hysteria.json")
+                remove_dir(f"{CLIENT_CONFIG_FILES_DIR}/{user['name']}")
                 rainb0w_users.remove(user)
 
         save_users(rainb0w_users, rainb0w_users_file)
 
 
-def print_client_info(username: str, rainb0w_users_file: str):
+def print_client_info(username: str, rainb0w_users_file: str, rainb0w_config_file: str):
+    rainb0w_config = load_toml(rainb0w_config_file)
     rainb0w_users = get_users(rainb0w_users_file)
     if rainb0w_users:
         for user in rainb0w_users:
             if user["name"] == username:
                 print("=" * 60)
-                print_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{user['name']}.txt")
+                print("\n*********************** Xray REALITY ***********************")
+                print_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{username}/reality-url.txt")
+                gen_qrcode(
+                    load_txt_file(
+                        f"{CLIENT_CONFIG_FILES_DIR}/{username}/reality-url.txt"
+                    )
+                )
+                print("\n*********************** MTProto ***********************")
+                print_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{username}/mtproto-url.txt")
+                gen_qrcode(
+                    load_txt_file(
+                        f"{CLIENT_CONFIG_FILES_DIR}/{username}/mtproto-url.txt"
+                    )
+                )
+                print("\n*********************** Hysteria ***********************")
+                print_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{username}/hysteria-url.txt")
+                gen_qrcode(
+                    load_txt_file(
+                        f"{CLIENT_CONFIG_FILES_DIR}/{username}/hysteria-url.txt"
+                    )
+                )
+                print(
+                    f"""
+    If your client does not support share links, configure it as the following:
+
+    Server:             {PUBLIC_IP}
+    Port:               {rainb0w_config['HYSTERIA']['PORT']}
+    Protocol:           UDP
+    SNI:                {rainb0w_config['HYSTERIA']['FAKE_SNI']}
+    ALPN:               {rainb0w_config['HYSTERIA']['ALPN']}
+    Obfuscation:        {rainb0w_config['HYSTERIA']['OBFS']}
+    Auth. Type:         BASE64
+    Payload:            {bytes_to_raw_str(base64.b64encode(user["password"].encode()))}
+    Allow Insecure:     Enabled
+    Max Upload:         YOUR REAL UPLOAD SPEED
+    Max Download:       YOUR REAL DOWNLOAD SPEED
+    QUIC Stream:        1677768
+    QUIC Conn.:         4194304
+    Disable Path MTU Discovery: Enabled
+        """
+                )
                 print("=" * 60)
-            print(
-                f"""\n
+                print(
+                    f"""\n
 You can also find pre-configured client.json files for {user['name']} at
-Xray REALITY:   [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}-reality.json[/green]
-Hysteria:       [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}-hysteria.json[/green]
+Xray REALITY:   [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/reality.json[/green]
+Hysteria:       [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/hysteria.json[/green]
+
+You can also find these QRCodes and pre-configured client.json files for '${username}' at
+Xray REALITY:
+    - JSON:   [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/reality.json[/green]
+    - QRCODE: [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/reality-qrcode.png[/green]
+Hysteria:
+    - JSON:   [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/hysteria.json[/green]
+    - QRCODE: [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/hysteria-qrcode.png[/green]
 You can use FTP clients, scp command, or even 'cat' them on the terminal and
 then copy and paste to a local json file to provide to your client apps.
 
 [bold yellow]NOTE: DO NOT SHARE THESE LINKS AND INFORMATION OVER SMS OR DOMESTIC MESSENGERS,
 USE EMAILS OR OTHER SECURE WAYS OF COMMUNICATION INSTEAD![/bold yellow]
-            """.lstrip()
-            )
+                """.lstrip()
+                )
 
 
 def prompt_username():

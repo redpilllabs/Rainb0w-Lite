@@ -9,6 +9,7 @@ fn_check_and_install_pkg openssl
 fn_check_and_install_pkg bc
 fn_check_and_install_pkg logrotate
 fn_check_and_install_pkg iptables-persistent
+fn_check_and_install_pkg qrencode
 source $PWD/lib/shell/os/install_docker.sh
 source $PWD/lib/shell/docker/init_vol_net.sh
 source $PWD/lib/shell/os/install_xt_geoip.sh
@@ -70,13 +71,28 @@ if [ ! $# -eq 0 ]; then
     if [ "$1" == 'Install' ]; then
         username=$(python3 $PWD/lib/shell/helper/get_username.py)
         echo $(printf '=%.0s' {1..60})
-        cat ${CLIENT_CONFIG_FILES_DIR}/${username}.txt
+        echo -e "\n*********************** Xray REALITY ***********************"
+        cat ${CLIENT_CONFIG_FILES_DIR}/${username}/reality-url.txt
+        echo -e "\n\n"
+        qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/reality-url.txt"
+        echo -e "\n*********************** MTProto ***********************"
+        cat ${CLIENT_CONFIG_FILES_DIR}/${username}/mtproto-url.txt
+        echo -e "\n\n"
+        qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/mtproto-url.txt"
+        echo -e "\n*********************** Hysteria ***********************"
+        cat ${CLIENT_CONFIG_FILES_DIR}/${username}/hysteria-url.txt
+        echo -e "\n\n"
+        qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/hysteria-url.txt"
         echo -e "\n"
         echo $(printf '=%.0s' {1..60})
         echo -e "\n
-You can also find pre-configured client.json files for '${username}' at
-Xray REALITY: ${GREEN}${CLIENT_CONFIG_FILES_DIR}/${username}-reality.json${RESET}
-Hysteria:     ${GREEN}${CLIENT_CONFIG_FILES_DIR}/${username}-hysteria.json${RESET}
+You can also find these QRCodes and pre-configured client.json files for '${username}' in the following paths:
+Xray REALITY:
+    - JSON:   ${GREEN}${CLIENT_CONFIG_FILES_DIR}/${username}/reality.json${RESET}
+    - QRCODE: ${GREEN}${CLIENT_CONFIG_FILES_DIR}/${username}/reality-qrcode.png${RESET}
+Hysteria:
+    - JSON:   ${GREEN}${CLIENT_CONFIG_FILES_DIR}/${username}/hysteria.json${RESET}
+    - QRCODE: ${GREEN}${CLIENT_CONFIG_FILES_DIR}/${username}/hysteria-qrcode.png${RESET}
 Use FTP clients, scp command, or even 'cat' them on the terminal and
 then copy and paste to a local json file to provide to your client apps.
 
