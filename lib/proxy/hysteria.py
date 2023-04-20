@@ -119,5 +119,5 @@ Max Upload:         YOUR REAL UPLOAD SPEED
 Max Download:       YOUR REAL DOWNLOAD SPEED
 QUIC Stream:        1677768
 QUIC Conn.:         4194304
-Path MTU Discovery: Enabled
+Disable Path MTU Discovery: Enabled
     """
