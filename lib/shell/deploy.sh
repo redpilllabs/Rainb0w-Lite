@@ -13,17 +13,6 @@ source $PWD/lib/shell/os/install_docker.sh
 source $PWD/lib/shell/docker/init_vol_net.sh
 source $PWD/lib/shell/os/install_xt_geoip.sh
 
-# Build a Docker image for MTProtoPy and check if the image was successfully buil
-if [ ! "$(docker images -q mtprotopy)" ]; then
-    docker buildx build --tag mtprotopy $HOME/Rainb0w_Lite_Home/mtprotopy/
-    if [ ! "$(docker images -q mtprotopy)" ]; then
-        echo -e "${B_RED}There was an issue when building a Docker image for 'MTProtoPy', check the logs!${RESET}"
-        echo -e "${B_YELLOW}After resolving the issue, run the installer again.${RESET}"
-        rm -rf $HOME/Rainb0w_Lite_Home
-        exit
-    fi
-fi
-
 # Apply Kernel's network stack optimizations
 source $PWD/lib/shell/performance/tune_kernel_net.sh
 
