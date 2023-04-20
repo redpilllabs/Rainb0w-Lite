@@ -29,6 +29,9 @@ This should be a wellknown domain and accessible on your network without a proxy
 You're actually disguising your traffic as destined for this website, and
 it will be applied to all of your proxies.
 
+NOTE: This cannot be a domain on Iranian IP, since outgoing
+connections to Iranian IPs are blocked with this script!
+
 Good examples include (but are not limited to):
     - dl.google.com
     - icloud.cdn-apple.com
