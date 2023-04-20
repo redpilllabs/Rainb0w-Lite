@@ -106,16 +106,18 @@ def print_hysteria_client_info(user_info: dict, proxy_config: dict, cert_config:
     return f"""
 *********************** HYSTERIA ***********************
 
-Server:         {PUBLIC_IP}
-Port:           {proxy_config['PORT']}
-Protocol:       UDP
-SNI:            {cert_config['FAKE_SNI']}
-ALPN:           {proxy_config['ALPN']}
-Obfuscation:    {proxy_config['OBFS']}
-Auth. Type:     BASE64
-Payload:        {bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))}
-Max Upload:     YOUR REAL UPLOAD SPEED
-Max Download:   YOUR REAL DOWNLOAD SPEED
-QUIC Stream:    1677768
-QUIC Conn.:     4194304
+Server:             {PUBLIC_IP}
+Port:               {proxy_config['PORT']}
+Protocol:           UDP
+SNI:                {cert_config['FAKE_SNI']}
+ALPN:               {proxy_config['ALPN']}
+Obfuscation:        {proxy_config['OBFS']}
+Auth. Type:         BASE64
+Payload:            {bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))}
+Allow Insecure:     Enabled
+Max Upload:         YOUR REAL UPLOAD SPEED
+Max Download:       YOUR REAL DOWNLOAD SPEED
+QUIC Stream:        1677768
+QUIC Conn.:         4194304
+Path MTU Discovery: Enabled
     """
