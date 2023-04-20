@@ -93,7 +93,7 @@ def add_user_to_proxies(
         load_txt_file(
             f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"
         ),
-        f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}hysteria-qrcode.png",
+        f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-qrcode.png",
     )
     configure_mtproto_client(
         user_info,
