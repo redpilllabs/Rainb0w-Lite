@@ -27,7 +27,7 @@ def configure_mtproto(
     mtproto_config["mtproto"]["mask_host"] = cert_config["FAKE_SNI"]
     mtproto_config["mtproto"]["sni"] = cert_config["FAKE_SNI"]
     mtproto_config["server"]["port"] = proxy_config["PORT"]
-    mtproto_docker_compose["services"]["mtproto"]["ports"] = [
+    mtproto_docker_compose["services"]["mtprotopy"]["ports"] = [
         f"{proxy_config['PORT']}:{proxy_config['PORT']}"
     ]
 
