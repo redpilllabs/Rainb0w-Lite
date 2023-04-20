@@ -3,7 +3,7 @@ from base.config import (
     PUBLIC_IP,
     XRAY_CLIENT_TEMPLATE_CONFIG_FILE,
 )
-from utils.cert_utils import extract_domain, is_subdomain
+from utils.cert_utils import is_subdomain
 from utils.helper import load_json, load_yaml, save_json, save_yaml, write_txt_file
 
 
@@ -63,15 +63,7 @@ def configure_xray_reality(
         "serverNames"
     ].append(cert_config["FAKE_SNI"])
 
-    if is_subdomain(cert_config["FAKE_SNI"]):
-        main_domain = extract_domain(cert_config["FAKE_SNI"])
-        xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
-            "serverNames"
-        ].append(main_domain)
-        xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
-            "serverNames"
-        ].append(f"www.{main_domain}")
-    else:
+    if not is_subdomain(cert_config["FAKE_SNI"]):
         xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
             "serverNames"
         ].append(f"www.{cert_config['FAKE_SNI']}")
