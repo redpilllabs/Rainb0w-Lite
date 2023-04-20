@@ -4,6 +4,6 @@ ENV PYTHONUNBUFFERED=1
 
 ADD mtprotopy.py /
 
-RUN pip install --no-cache-dir -U uvloop cryptography toml
+RUN pip install --no-cache-dir uvloop cryptography toml
 
 ENTRYPOINT [ "python3", "mtprotopy.py" ]
