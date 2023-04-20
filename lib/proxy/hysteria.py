@@ -17,10 +17,7 @@ from utils.helper import (
 def prompt_hysteria_alpn():
     print(
         """
-[Optional | Recommended] Enter an ALPN value for Hysteria packets.
-If you're using a common port for Hysteria, it's recommended to match
-it with the actual ALPN value of legitimate traffic on that port!
-If you're using an uncommon port, you can leave this blank or set a random ALPN.
+[Optional | Recommended] Enter an ALPN value for Hysteria packets.If you're using a common port for Hysteria, it's recommended to match it with the actual ALPN value of legitimate traffic on that port! If you're using an uncommon port, you can leave this blank or set a random ALPN.
 
 You can see a brief list of common ports and their corresponding ALPNs:
     - 443/udp:  h3
@@ -38,9 +35,7 @@ You can see a brief list of common ports and their corresponding ALPNs:
 def prompt_hysteria_obfs():
     print(
         """
-[Optional | Recommended] Generate a random and strong password to obfuscate the Hysteria traffic.
-Skipping this will disable obfuscation and your traffic will be known as normal QUIC traffic.
-Usually you need to enable this, since QUIC is mostly blocked in Iran.
+[Optional | Recommended] Generate a random and strong password to obfuscate the Hysteria traffic. Skipping this will disable obfuscation and your traffic will be known as normal QUIC traffic. Usually you need to enable this, since QUIC is mostly blocked in Iran.
 
 NOTE: If you're trying to closely match the QUIC traffic characteristics
 you need to disable this and use the port 443/udp and the 'h3' ALPN as they
