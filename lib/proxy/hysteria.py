@@ -1,7 +1,16 @@
 import base64
+import random
+from time import sleep
 
 from base.config import CLIENT_CONFIG_FILES_DIR, HYSTERIA_CLIENT_TEMPLATE_CONFIG_FILE
-from utils.helper import bytes_to_raw_str, load_json, load_yaml, save_json, save_yaml
+from utils.helper import (
+    bytes_to_raw_str,
+    gen_random_string,
+    load_json,
+    load_yaml,
+    save_json,
+    save_yaml,
+)
 
 
 def prompt_hysteria_alpn():
@@ -28,19 +37,24 @@ You can see a brief list of common ports and their corresponding ALPNs:
 def prompt_hysteria_obfs():
     print(
         """
-[Optional | Recommended] Enter a random and strong password to obfuscate the Hysteria traffic.
-Leaving this blank, will DISABLE the obfuscation and your traffic will be known as normal QUIC traffic.
-Usually you need to fill this, since QUIC is mostly blocked in Iran.
+[Optional | Recommended] Generate a random and strong password to obfuscate the Hysteria traffic.
+Skipping this will disable obfuscation and your traffic will be known as normal QUIC traffic.
+Usually you need to enable this, since QUIC is mostly blocked in Iran.
 
 NOTE: If you're trying to closely match the QUIC traffic characteristics
-you need to leave this blank and use the port 443/udp and the 'h3' ALPN as they
+you need to disable this and use the port 443/udp and the 'h3' ALPN as they
 are the official specs for QUIC traffic.
         """
     )
-    obfs = input("\nEnter a random obfuscation password: ")
-    if obfs:
+    choice = input("\nGenerate a secure password for obfs? [Y/n] ")
+    if choice in ["y", "Y", "Yes", "YES"]:
+        obfs = gen_random_string(random.randint(8, 12))
+        print(f"Generated secure obfs password: {obfs}")
+        sleep(1)
         return obfs
     else:
+        print("Disabling obfuscation for Hysteria.")
+        sleep(1)
         return None
 
 
@@ -103,21 +117,51 @@ def configure_hysteria_client(user_info: dict, proxy_config: dict, cert_config: 
 def print_hysteria_client_info(user_info: dict, proxy_config: dict, cert_config: dict):
     from base.config import PUBLIC_IP
 
-    return f"""
-*********************** HYSTERIA ***********************
+    auth_base64 = bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))
+    auth_base64 = auth_base64.replace("=", "%3D")
 
-Server:             {PUBLIC_IP}
-Port:               {proxy_config['PORT']}
-Protocol:           UDP
-SNI:                {cert_config['FAKE_SNI']}
-ALPN:               {proxy_config['ALPN']}
-Obfuscation:        {proxy_config['OBFS']}
-Auth. Type:         BASE64
-Payload:            {bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))}
-Allow Insecure:     Enabled
-Max Upload:         YOUR REAL UPLOAD SPEED
-Max Download:       YOUR REAL DOWNLOAD SPEED
-QUIC Stream:        1677768
-QUIC Conn.:         4194304
-Disable Path MTU Discovery: Enabled
+    if {proxy_config["OBFS"]}:
+        return f"""
+    *********************** HYSTERIA ***********************
+
+    hysteria://{PUBLIC_IP}:{proxy_config['PORT']}/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}+Hysteria
+
+    If your client does not support share links, configure it as the following:
+
+    Server:             {PUBLIC_IP}
+    Port:               {proxy_config['PORT']}
+    Protocol:           UDP
+    SNI:                {cert_config['FAKE_SNI']}
+    ALPN:               {proxy_config['ALPN']}
+    Obfuscation:        {proxy_config['OBFS']}
+    Auth. Type:         BASE64
+    Payload:            {bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))}
+    Allow Insecure:     Enabled
+    Max Upload:         YOUR REAL UPLOAD SPEED
+    Max Download:       YOUR REAL DOWNLOAD SPEED
+    QUIC Stream:        1677768
+    QUIC Conn.:         4194304
+    Disable Path MTU Discovery: Enabled
+        """
+    else:
+        return f"""
+    *********************** HYSTERIA ***********************
+
+    hysteria://{PUBLIC_IP}:{proxy_config['PORT']}/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}#{user_info['name']}+Hysteria
+
+    If your client does not support share links, configure it as the following:
+
+    Server:             {PUBLIC_IP}
+    Port:               {proxy_config['PORT']}
+    Protocol:           UDP
+    SNI:                {cert_config['FAKE_SNI']}
+    ALPN:               {proxy_config['ALPN']}
+    Auth. Type:         BASE64
+    Payload:            {bytes_to_raw_str(base64.b64encode(user_info["password"].encode()))}
+    Allow Insecure:     Enabled
+    Max Upload:         YOUR REAL UPLOAD SPEED
+    Max Download:       YOUR REAL DOWNLOAD SPEED
+    QUIC Stream:        1677768
+    QUIC Conn.:         4194304
+    Disable Path MTU Discovery: Enabled
     """
