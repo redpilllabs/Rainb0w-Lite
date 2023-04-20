@@ -43,10 +43,8 @@
 
 ```
 apt install git
-cd ~
 git clone https://github.com/0xNeu/Rainb0w-Lite.git
 cd Rainb0w-Lite
-chmod +x *.sh
 ./run.sh
 ```
 
