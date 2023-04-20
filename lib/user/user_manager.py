@@ -165,7 +165,7 @@ def print_client_info(username: str, rainb0w_users_file: str, rainb0w_config_fil
     Server:             {PUBLIC_IP}
     Port:               {rainb0w_config['HYSTERIA']['PORT']}
     Protocol:           UDP
-    SNI:                {rainb0w_config['HYSTERIA']['FAKE_SNI']}
+    SNI:                {rainb0w_config['CERT']['FAKE_SNI']}
     ALPN:               {rainb0w_config['HYSTERIA']['ALPN']}
     Obfuscation:        {rainb0w_config['HYSTERIA']['OBFS']}
     Auth. Type:         BASE64
