@@ -29,15 +29,10 @@ This should be a wellknown domain and accessible on your network without a proxy
 You're actually disguising your traffic as destined for this website, and
 it will be applied to all of your proxies.
 
+TIP: Good examples include domains hosted on your network subnet. You should research and find them based on your assigned IP.
+
 NOTE: This cannot be a domain on Iranian IP, since outgoing
 connections to Iranian IPs are blocked with this script!
-
-Good examples include (but are not limited to):
-    - dl.google.com
-    - icloud.cdn-apple.com
-    - icloud.com
-    - github.com
-    - download.nvidia.com
     """
     )
     fake_sni = input("\nEnter a fake SNI: ")
