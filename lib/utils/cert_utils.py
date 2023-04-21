@@ -31,7 +31,7 @@ it will be applied to all of your proxies.
 
 TIP: Good examples include domains hosted on your network subnet. You should research and find them based on your assigned IP.
 
-NOTE: This cannot be a domain on Iranian IP, since outgoing
+NOTE: This cannot be a domain on Iranian IP or an [.ir] domain, since outgoing
 connections to Iranian IPs are blocked with this script!
     """
     )
