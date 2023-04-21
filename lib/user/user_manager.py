@@ -60,25 +60,22 @@ def create_new_user(username: str):
     return user_info
 
 
-def add_user_to_proxies(
+def gen_user_links_qrcodes(
     user_info: dict,
-    rainb0w_users_file: str,
     rainb0w_config_file: str,
-    xray_config_file: str,
-    hysteria_config_file: str,
 ):
+    """
+    Generates share links and QR codes with the given user info and proxy configuration
+
+    Args:
+        user_info (dict): User dictionary containing username, secrets and passwords
+        rainb0w_config_file (str): Path to the rainb0w_config.toml file holding proxy configuration
+    """
     rainb0w_config = load_toml(rainb0w_config_file)
 
-    if not os.path.exists(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}"):
-        os.makedirs(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}")
-
-    # Add user to proxies (MTProto is directly loaded from the users.toml file)
-    xray_add_user(user_info, xray_config_file)
-    hysteria_add_user(user_info, hysteria_config_file)
-
-    # Create a client json file for applicable proxies
     if not os.path.exists(CLIENT_CONFIG_FILES_DIR):
         os.makedirs(CLIENT_CONFIG_FILES_DIR)
+
     configure_xray_reality_client(
         user_info, rainb0w_config["REALITY"], rainb0w_config["CERT"]
     )
@@ -105,6 +102,20 @@ def add_user_to_proxies(
         load_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-url.txt"),
         f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-qrcode.png",
     )
+
+
+def add_user_to_proxies(
+    user_info: dict,
+    rainb0w_users_file: str,
+    rainb0w_config_file: str,
+    xray_config_file: str,
+    hysteria_config_file: str,
+):
+    # Add user to proxies (MTProto is directly loaded from the users.toml file)
+    xray_add_user(user_info, xray_config_file)
+    hysteria_add_user(user_info, hysteria_config_file)
+
+    gen_user_links_qrcodes(user_info, rainb0w_config_file)
 
     rainb0w_users = get_users(rainb0w_users_file)
     rainb0w_users.append(user_info)

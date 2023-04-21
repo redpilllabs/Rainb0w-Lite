@@ -105,3 +105,25 @@ def configure_xray_reality_client(
     save_json(
         client_config, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality.json"
     )
+
+
+def reset_xray_sni(
+    sni: str,
+    xray_config_file: str,
+):
+    xray_config = load_json(xray_config_file)
+
+    xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
+        "dest"
+    ] = f"{sni}:443"
+
+    xray_config["inbounds"][0]["streamSettings"]["realitySettings"]["serverNames"] = [
+        sni
+    ]
+
+    if not is_subdomain(sni):
+        xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
+            "serverNames"
+        ].append(f"www.{sni}")
+
+    save_json(xray_config, xray_config_file)

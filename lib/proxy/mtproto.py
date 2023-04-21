@@ -66,3 +66,15 @@ def configure_mtproto_client(
             https_prefix + hex_faketls,
             f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-url.txt",
         )
+
+
+def reset_mtproto_sni(
+    sni: str,
+    mtproto_config_file: str,
+):
+    mtproto_config = load_toml(mtproto_config_file)
+
+    mtproto_config["mtproto"]["mask_host"] = sni
+    mtproto_config["mtproto"]["sni"] = sni
+
+    save_toml(mtproto_config, mtproto_config_file)

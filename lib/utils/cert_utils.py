@@ -1,5 +1,7 @@
 import re
 
+from utils.helper import load_toml
+
 
 def is_domain(domain: str) -> bool:
     regex = r"^[a-zA-Z0-9][a-zA-Z0-9\-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$"
@@ -21,6 +23,7 @@ def extract_domain(domain: str) -> str:
         return domain
 
 
+# TODO: Implement .ir regex check
 def prompt_fake_sni() -> str:
     print(
         """
@@ -43,3 +46,8 @@ connections to Iranian IPs are blocked with this script!
         fake_sni = input("Enter a fake SNI: ")
 
     return fake_sni
+
+
+def get_current_sni(rainb0w_config_file: str):
+    rainb0w_config = load_toml(rainb0w_config_file)
+    return rainb0w_config["CERT"]["FAKE_SNI"]

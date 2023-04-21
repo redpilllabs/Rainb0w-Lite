@@ -3,6 +3,7 @@
 
 import os
 import re
+from fileinput import FileInput
 from time import sleep
 from typing import List
 
@@ -10,6 +11,7 @@ from base.config import (
     BLOCKY_CONFIG_FILE,
     CLIENT_CONFIG_FILES_DIR,
     HYSTERIA_CONFIG_FILE,
+    MTPROTOPY_CONFIG_FILE,
     RAINB0W_BACKUP_DIR,
     RAINB0W_CONFIG_FILE,
     RAINB0W_USERS_FILE,
@@ -17,19 +19,81 @@ from base.config import (
 )
 from pick import pick
 from proxy.blocky import disable_porn_dns_blocking, enable_porn_dns_blocking
+from proxy.mtproto import reset_mtproto_sni
+from proxy.xray import reset_xray_sni
 from rich import print
 from user.user_manager import (
     add_user_to_proxies,
     create_new_user,
+    gen_user_links_qrcodes,
     get_users,
     print_client_info,
     remove_user,
 )
 from utils.ac_utils import is_porn_blocked
-from utils.helper import clear_screen, copy_dir, copy_file, prompt_clear_screen
+from utils.cert_utils import get_current_sni, prompt_fake_sni
+from utils.helper import (
+    clear_screen,
+    copy_dir,
+    copy_file,
+    load_toml,
+    prompt_clear_screen,
+    save_toml,
+)
 from utils.os_utils import is_network_stack_tweaked, is_service_running, run_system_cmd
 
 NEED_SERVICE_RESTART = False
+
+
+def sni_menu():
+    global NEED_SERVICE_RESTART
+
+    title = "Select any option:"
+    options = [
+        "View Currently Set SNI",
+        "Change SNI",
+        "Back to Main Menu",
+    ]
+    option, _ = pick(options, title)
+    if option == "View Currently Set SNI":
+        clear_screen()
+        sni = get_current_sni(RAINB0W_CONFIG_FILE)
+        print(f"Current SNI: {sni}")
+        prompt_clear_screen()
+    elif option == "Change SNI":
+        clear_screen()
+        rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
+        rainb0w_config["CERT"]["FAKE_SNI"] = prompt_fake_sni()
+        print("Resetting the new SNI on proxies")
+        reset_xray_sni(rainb0w_config["CERT"]["FAKE_SNI"], XRAY_CONFIG_FILE)
+        reset_mtproto_sni(rainb0w_config["CERT"]["FAKE_SNI"], MTPROTOPY_CONFIG_FILE)
+        run_system_cmd(
+            [
+                f"{os.getcwd()}/lib/shell/cryptography/gen_x509_cert.sh",
+                rainb0w_config["CERT"]["FAKE_SNI"],
+            ]
+        )
+        with FileInput(
+            "/usr/libexec/rainb0w/renew_selfsigned_cert.sh", inplace=True
+        ) as file:
+            for line in file:
+                if line.startswith("COMMON_NAME="):
+                    line = f"COMMON_NAME={rainb0w_config['CERT']['FAKE_SNI']}"
+                print(line, end="")
+
+        save_toml(rainb0w_config, RAINB0W_CONFIG_FILE)
+        # Regenerate user links and QR codes with the new SNI
+        print("Regenerating user share links and QR codes")
+        rainb0w_users = get_users(RAINB0W_USERS_FILE)
+        if rainb0w_users:
+            for user in rainb0w_users:
+                gen_user_links_qrcodes(user, RAINB0W_CONFIG_FILE)
+        NEED_SERVICE_RESTART = True
+        print(
+            "Changes only take effect after selecting 'Apply Changes' in the dashboard!"
+        )
+        prompt_clear_screen()
+    dashboard()
 
 
 def performance_menu():
@@ -219,6 +283,7 @@ def dashboard():
     global NEED_SERVICE_RESTART
     title = """Choose any options to proceed:"""
     options = [
+        "SNI Settings",
         "Performance Settings",
         "Access Controls",
         "Manage Users",
@@ -228,7 +293,9 @@ def dashboard():
         "Apply Changes" if NEED_SERVICE_RESTART else "Exit",
     ]
     option, _ = pick(options, title)
-    if option == "Performance Settings":
+    if option == "SNI Settings":
+        sni_menu()
+    elif option == "Performance Settings":
         performance_menu()
     elif option == "Access Controls":
         access_controls_menu()
