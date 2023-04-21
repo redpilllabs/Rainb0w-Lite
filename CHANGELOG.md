@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.3
+
+- Add ability to change the fake SNI
+- Minor code cleanup
+
 ## Version 1.2
 
 - Pull pre-built MTProto Docker image from Docker Hub
