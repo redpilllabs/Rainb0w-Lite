@@ -5,7 +5,6 @@ import signal
 import sys
 
 from base.config import (
-    CLIENT_CONFIG_FILES_DIR,
     HYSTERIA_CONFIG_FILE,
     HYSTERIA_DOCKER_COMPOSE_FILE,
     MTPROTOPY_CONFIG_FILE,
@@ -23,15 +22,20 @@ from proxy.hysteria import (
 )
 from proxy.mtproto import configure_mtproto
 from proxy.xray import configure_xray_reality
-from user.user_manager import add_user_to_proxies, create_new_user, prompt_username
+from user.user_manager import (
+    add_user_to_proxies,
+    create_new_user,
+    get_users,
+    prompt_username,
+    save_users,
+)
 from utils.cert_utils import prompt_fake_sni
-from utils.helper import copy_dir, copy_file, load_toml, progress_indicator, save_toml
+from utils.helper import copy_file, load_toml, progress_indicator, save_toml
 from utils.net_utils import prompt_port_number
 
 
-def apply_config(username=None):
+def apply_config():
     rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
-    rainb0w_users = load_toml(RAINB0W_USERS_FILE)
 
     configure_xray_reality(
         rainb0w_config["REALITY"],
@@ -53,26 +57,15 @@ def apply_config(username=None):
         MTPROTOPY_DOCKER_COMPOSE_FILE,
     )
 
-    # If this is a new Express/Custom deployment, we need to create a default user
-    # if it's a 'Restore' we will restore the existing users one by one
-    if username:
+    # Add users from the rainb0w_users.toml into proxies
+    rainb0w_users = get_users(RAINB0W_USERS_FILE)
+    for user in rainb0w_users:
         add_user_to_proxies(
-            create_new_user(username),
-            RAINB0W_USERS_FILE,
+            user,
             RAINB0W_CONFIG_FILE,
             XRAY_CONFIG_FILE,
             HYSTERIA_CONFIG_FILE,
         )
-    else:
-        # Add users from the rainb0w_users.toml into proxies
-        for user in rainb0w_users["users"]:
-            add_user_to_proxies(
-                user,
-                RAINB0W_USERS_FILE,
-                RAINB0W_CONFIG_FILE,
-                XRAY_CONFIG_FILE,
-                HYSTERIA_CONFIG_FILE,
-            )
 
     exit(0)
 
@@ -88,7 +81,6 @@ def restore_config():
             f"{RAINB0W_BACKUP_DIR}/{os.path.basename(RAINB0W_USERS_FILE)}",
             RAINB0W_USERS_FILE,
         )
-        copy_dir(f"{RAINB0W_BACKUP_DIR}/clients", CLIENT_CONFIG_FILES_DIR)
         apply_config()
     else:
         print(f"ERROR: No data found at: {RAINB0W_BACKUP_DIR}")
@@ -136,10 +128,16 @@ def configure():
     progress_indicator(7, 7, "User Management")
     username = prompt_username()
 
+    # Generate a user object with the given name and save it to users file
+    user_info = create_new_user(username)
+    rainb0w_users = get_users(RAINB0W_USERS_FILE)
+    rainb0w_users.append(user_info)
+    save_users(rainb0w_users, RAINB0W_USERS_FILE)
+
     # Save the configuration to file because we're going to pass it around next
     save_toml(rainb0w_config, RAINB0W_CONFIG_FILE)
 
-    apply_config(username=username)
+    apply_config()
 
 
 def main():

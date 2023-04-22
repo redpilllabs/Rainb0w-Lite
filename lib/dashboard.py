@@ -29,6 +29,7 @@ from user.user_manager import (
     get_users,
     print_client_info,
     remove_user,
+    save_users,
 )
 from utils.ac_utils import is_porn_blocked
 from utils.cert_utils import get_current_sni, prompt_fake_sni
@@ -207,9 +208,11 @@ def users_management_menu():
             else:
                 NEED_SERVICE_RESTART = True
                 user_info = create_new_user(username_input)
+                rainb0w_users = get_users(RAINB0W_USERS_FILE)
+                rainb0w_users.append(user_info)
+                save_users(rainb0w_users, RAINB0W_USERS_FILE)
                 add_user_to_proxies(
                     user_info,
-                    RAINB0W_USERS_FILE,
                     RAINB0W_CONFIG_FILE,
                     XRAY_CONFIG_FILE,
                     HYSTERIA_CONFIG_FILE,

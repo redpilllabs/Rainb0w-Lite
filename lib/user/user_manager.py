@@ -5,8 +5,6 @@ from os import urandom
 from random import randint
 from uuid import uuid4
 
-from rich import print
-
 from base.config import CLIENT_CONFIG_FILES_DIR, PUBLIC_IP
 from proxy.hysteria import (
     configure_hysteria_client,
@@ -15,6 +13,7 @@ from proxy.hysteria import (
 )
 from proxy.mtproto import configure_mtproto_client
 from proxy.xray import configure_xray_reality_client, xray_add_user, xray_remove_user
+from rich import print
 from utils.helper import (
     bytes_to_raw_str,
     gen_qrcode,
@@ -107,20 +106,17 @@ def gen_user_links_qrcodes(
 
 def add_user_to_proxies(
     user_info: dict,
-    rainb0w_users_file: str,
     rainb0w_config_file: str,
     xray_config_file: str,
     hysteria_config_file: str,
 ):
+    print(f"Adding user [green]'{user_info['name']}'[/green] to proxies")
     # Add user to proxies (MTProto is directly loaded from the users.toml file)
     xray_add_user(user_info, xray_config_file)
     hysteria_add_user(user_info, hysteria_config_file)
 
+    # Generate user sharing links and QR codes
     gen_user_links_qrcodes(user_info, rainb0w_config_file)
-
-    rainb0w_users = get_users(rainb0w_users_file)
-    rainb0w_users.append(user_info)
-    save_users(rainb0w_users, rainb0w_users_file)
 
 
 def remove_user(
@@ -138,8 +134,7 @@ def remove_user(
                 hysteria_remove_user(user, hysteria_config_file)
                 remove_dir(f"{CLIENT_CONFIG_FILES_DIR}/{user['name']}")
                 rainb0w_users.remove(user)
-
-        save_users(rainb0w_users, rainb0w_users_file)
+                save_users(rainb0w_users, rainb0w_users_file)
 
 
 def print_client_info(username: str, rainb0w_users_file: str, rainb0w_config_file: str):
