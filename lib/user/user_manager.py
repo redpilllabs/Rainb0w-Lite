@@ -44,7 +44,6 @@ def save_users(users: list, users_toml_file: str):
 
 
 def create_new_user(username: str):
-    print(f"Adding '{username}' as a new user...")
     password = gen_random_string(randint(8, 12))
     uuid = str(uuid4())
     short_id = "".join(random.choice("0123456789abcdef") for _ in range(8))
