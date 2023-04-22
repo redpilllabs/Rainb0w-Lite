@@ -73,8 +73,8 @@ def gen_user_links_qrcodes(
     """
     rainb0w_config = load_toml(rainb0w_config_file)
 
-    if not os.path.exists(CLIENT_CONFIG_FILES_DIR):
-        os.makedirs(CLIENT_CONFIG_FILES_DIR)
+    if not os.path.exists(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}"):
+        os.makedirs(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}")
 
     configure_xray_reality_client(
         user_info, rainb0w_config["REALITY"], rainb0w_config["CERT"]
