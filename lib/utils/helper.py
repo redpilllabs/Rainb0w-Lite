@@ -153,11 +153,13 @@ def copy_file(src_path, dest_path):
 
 
 def remove_dir(path):
-    shutil.rmtree(path)
+    if os.path.exists(path):
+        shutil.rmtree(path)
 
 
 def remove_file(path):
-    os.remove(path)
+    if os.path.exists(path):
+        os.remove(path)
 
 
 def gen_qrcode(data):
@@ -167,8 +169,7 @@ def gen_qrcode(data):
 
 
 def save_qrcode(data, output_path: str):
-    if os.path.exists(output_path):
-        remove_file(output_path)
+    remove_file(output_path)
     command = "qrencode -t PNG32 -s 4 " + data + " -o " + output_path
     process = subprocess.run(command.split(), stdout=subprocess.PIPE)
     print(process.stdout.decode("utf-8"))
