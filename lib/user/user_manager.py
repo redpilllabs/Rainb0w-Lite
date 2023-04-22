@@ -187,7 +187,7 @@ def print_client_info(username: str, rainb0w_users_file: str, rainb0w_config_fil
                 print("=" * 60)
                 print(
                     f"""\n
-You can also find these QRCodes and pre-configured client.json files for '${username}' at
+You can also find these QRCodes and pre-configured client.json files for '{username}' at
 Xray REALITY:
     - JSON:   [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/reality.json[/green]
     - QRCODE: [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/reality-qrcode.png[/green]
