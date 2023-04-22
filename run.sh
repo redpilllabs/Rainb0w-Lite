@@ -83,10 +83,13 @@ Choose an option: "
     case $ans in
     2)
         clear
+        # Move the files in place
+        clear_and_copy_files
         python3 $PWD/lib/configurator.py "Restore"
         PYTHON_EXIT_CODE=$?
         if [ $PYTHON_EXIT_CODE -ne 0 ]; then
             echo "Python configurator did not finish successfully!"
+            rm -rf $HOME/Rainb0w_Lite_Home
             exit
         fi
         source $PWD/lib/shell/deploy.sh "Restore"

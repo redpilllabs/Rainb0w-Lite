@@ -78,6 +78,7 @@ def apply_config(username=None):
 
 
 def restore_config():
+    print("Restoring your configuration and users...")
     if os.path.exists(RAINB0W_BACKUP_DIR):
         copy_file(
             f"{RAINB0W_BACKUP_DIR}/{os.path.basename(RAINB0W_CONFIG_FILE)}",
@@ -88,7 +89,6 @@ def restore_config():
             RAINB0W_USERS_FILE,
         )
         copy_dir(f"{RAINB0W_BACKUP_DIR}/clients", CLIENT_CONFIG_FILES_DIR)
-        print("Restoring your configuration and users...")
         apply_config()
     else:
         print(f"ERROR: No data found at: {RAINB0W_BACKUP_DIR}")
