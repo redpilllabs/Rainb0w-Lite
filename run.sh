@@ -69,6 +69,9 @@ function clear_and_copy_files() {
 
 function installer_menu() {
     echo -ne "
+Rainb0w Lite Proxy Installer v${VERSION}
+Author: Neu
+
 * Install:    Deploys a new configuration of proxies (REALITY, Hysteria, MTProto)
 * Restore:    Restore a previous installation's configuration and users
 

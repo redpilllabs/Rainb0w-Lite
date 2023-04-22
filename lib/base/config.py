@@ -2,9 +2,6 @@ import os
 
 from utils.helper import get_public_ip
 
-# General
-VERSION = "1.3"
-
 # Server info
 PUBLIC_IP = get_public_ip()
 
