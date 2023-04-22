@@ -1,6 +1,7 @@
 #!/bin/bash
 source $PWD/lib/shell/base/colors.sh
 source $PWD/lib/shell/base/config.sh
+source $PWD/lib/shell/text/text_utils.sh
 source $PWD/lib/shell/os/os_utils.sh
 source $PWD/lib/shell/docker/docker_utils.sh
 
@@ -94,3 +95,11 @@ fi
 
 echo -e "\nYou can add/remove users or find more options in the dashboard,
 in order to display the dashboard run the 'run.sh' script again.${RESET}"
+
+echo -e "\n"
+fn_typewriter "Women " $B_GREEN
+fn_typewriter "Life " $B_WHITE
+fn_typewriter "Freedom..." $B_RED
+echo ""
+fn_typewriter "#MahsaAmini " $B_WHITE
+echo -e "\n"
