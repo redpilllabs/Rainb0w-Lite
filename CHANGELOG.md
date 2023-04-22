@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.4
+
+- Fix restoring backups
+- Fix duplicate users when restoring
+- Add safety checks for file/dir removals
+- Remind us what brings us together and what makes us united
+
 ## Version 1.3
 
 - Add ability to change the fake SNI
