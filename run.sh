@@ -37,7 +37,7 @@ else
                 fn_check_and_install_pkg linux-image-$latest_kernel-amd64
                 fn_check_and_install_pkg linux-headers-$latest_kernel-amd64
                 echo -e "${B_GREEN}\n\nA newer kernel '$latest_kernel' is installed on your Debian.${RESET}"
-                echo -e "${B_RED}You're server is now going to reboot to load the new kernel and the extra moduels required${RESET}"
+                echo -e "${B_RED}You're server is now going to reboot to load the new kernel and the extra modules required${RESET}"
                 echo -e "${B_GREEN}After booting up, run the script again with the following commands to proceed!${RESET}"
                 echo -e "${B_YELLOW}cd Rainb0w-Lite"
                 echo -e "./run.sh${RESET}"
