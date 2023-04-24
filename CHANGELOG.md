@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.5
+
+THIS RELEASE HAS BREAKING CHANGES, YOU SHOULD DO A FRESH INSTALL
+
+- Give users choice on proxies to deploy
+- Add a regex check preventing .ir domains as the SNI
+
 ## Version 1.4
 
 - Fix restoring backups
