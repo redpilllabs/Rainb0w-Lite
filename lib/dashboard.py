@@ -66,21 +66,24 @@ def sni_menu():
         rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
         rainb0w_config["CERT"]["FAKE_SNI"] = prompt_fake_sni()
         print("Resetting the new SNI on proxies")
-        reset_xray_sni(rainb0w_config["CERT"]["FAKE_SNI"], XRAY_CONFIG_FILE)
-        reset_mtproto_sni(rainb0w_config["CERT"]["FAKE_SNI"], MTPROTOPY_CONFIG_FILE)
-        run_system_cmd(
-            [
-                f"{os.getcwd()}/lib/shell/cryptography/gen_x509_cert.sh",
-                rainb0w_config["CERT"]["FAKE_SNI"],
-            ]
-        )
-        with FileInput(
-            "/usr/libexec/rainb0w/renew_selfsigned_cert.sh", inplace=True
-        ) as file:
-            for line in file:
-                if line.startswith("COMMON_NAME="):
-                    line = f"COMMON_NAME={rainb0w_config['CERT']['FAKE_SNI']}"
-                print(line, end="")
+        if rainb0w_config["XRAY"]["IS_ENABLED"]:
+            reset_xray_sni(rainb0w_config["CERT"]["FAKE_SNI"], XRAY_CONFIG_FILE)
+        if rainb0w_config["MTPROTO"]["IS_ENABLED"]:
+            reset_mtproto_sni(rainb0w_config["CERT"]["FAKE_SNI"], MTPROTOPY_CONFIG_FILE)
+        if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
+            run_system_cmd(
+                [
+                    f"{os.getcwd()}/lib/shell/cryptography/gen_x509_cert.sh",
+                    rainb0w_config["CERT"]["FAKE_SNI"],
+                ]
+            )
+            with FileInput(
+                "/usr/libexec/rainb0w/renew_selfsigned_cert.sh", inplace=True
+            ) as file:
+                for line in file:
+                    if line.startswith("COMMON_NAME="):
+                        line = f"COMMON_NAME={rainb0w_config['CERT']['FAKE_SNI']}"
+                    print(line, end="")
 
         save_toml(rainb0w_config, RAINB0W_CONFIG_FILE)
         # Regenerate user links and QR codes with the new SNI
@@ -173,6 +176,7 @@ def user_info_menu(user: str):
             NEED_SERVICE_RESTART = True
             remove_user(
                 user,
+                RAINB0W_CONFIG_FILE,
                 RAINB0W_USERS_FILE,
                 XRAY_CONFIG_FILE,
                 HYSTERIA_CONFIG_FILE,

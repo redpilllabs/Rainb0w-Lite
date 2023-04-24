@@ -75,32 +75,41 @@ def gen_user_links_qrcodes(
     if not os.path.exists(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}"):
         os.makedirs(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}")
 
-    configure_xray_reality_client(
-        user_info, rainb0w_config["REALITY"], rainb0w_config["CERT"]
-    )
-    save_qrcode(
-        load_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-url.txt"),
-        f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-qrcode.png",
-    )
-    configure_hysteria_client(
-        user_info, rainb0w_config["HYSTERIA"], rainb0w_config["CERT"]
-    )
-    save_qrcode(
-        load_txt_file(
-            f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"
-        ),
-        f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-qrcode.png",
-    )
-    configure_mtproto_client(
-        user_info,
-        rainb0w_config["MTPROTO"],
-        rainb0w_config["CERT"],
-        base64_encode=False,
-    )
-    save_qrcode(
-        load_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-url.txt"),
-        f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-qrcode.png",
-    )
+    if rainb0w_config["XRAY"]["IS_ENABLED"]:
+        configure_xray_reality_client(
+            user_info, rainb0w_config["XRAY"], rainb0w_config["CERT"]
+        )
+        save_qrcode(
+            load_txt_file(
+                f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-url.txt"
+            ),
+            f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-qrcode.png",
+        )
+
+    if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
+        configure_hysteria_client(
+            user_info, rainb0w_config["HYSTERIA"], rainb0w_config["CERT"]
+        )
+        save_qrcode(
+            load_txt_file(
+                f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"
+            ),
+            f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-qrcode.png",
+        )
+
+    if rainb0w_config["MTPROTO"]["IS_ENABLED"]:
+        configure_mtproto_client(
+            user_info,
+            rainb0w_config["MTPROTO"],
+            rainb0w_config["CERT"],
+            base64_encode=False,
+        )
+        save_qrcode(
+            load_txt_file(
+                f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-url.txt"
+            ),
+            f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/mtproto-qrcode.png",
+        )
 
 
 def add_user_to_proxies(
@@ -110,9 +119,14 @@ def add_user_to_proxies(
     hysteria_config_file: str,
 ):
     print(f"Adding user [green]'{user_info['name']}'[/green] to proxies")
-    # Add user to proxies (MTProto is directly loaded from the users.toml file)
-    xray_add_user(user_info, xray_config_file)
-    hysteria_add_user(user_info, hysteria_config_file)
+    rainb0w_config = load_toml(rainb0w_config_file)
+
+    if rainb0w_config["XRAY"]["IS_ENABLED"]:
+        xray_add_user(user_info, xray_config_file)
+    if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
+        hysteria_add_user(user_info, hysteria_config_file)
+
+    # MTProto users are directly loaded from the users.toml file
 
     # Generate user sharing links and QR codes
     gen_user_links_qrcodes(user_info, rainb0w_config_file)
@@ -120,17 +134,21 @@ def add_user_to_proxies(
 
 def remove_user(
     username: str,
+    rainb0w_config_file: str,
     rainb0w_users_file: str,
     xray_config_file: str,
     hysteria_config_file: str,
 ):
+    rainb0w_config = load_toml(rainb0w_config_file)
     rainb0w_users = get_users(rainb0w_users_file)
     if rainb0w_users:
         for user in rainb0w_users:
             if user["name"] == username:
                 print(f"Removing the user '{username}'...")
-                xray_remove_user(user, xray_config_file)
-                hysteria_remove_user(user, hysteria_config_file)
+                if rainb0w_config["XRAY"]["IS_ENABLED"]:
+                    xray_remove_user(user, xray_config_file)
+                if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
+                    hysteria_remove_user(user, hysteria_config_file)
                 remove_dir(f"{CLIENT_CONFIG_FILES_DIR}/{user['name']}")
                 rainb0w_users.remove(user)
                 save_users(rainb0w_users, rainb0w_users_file)
@@ -143,57 +161,64 @@ def print_client_info(username: str, rainb0w_users_file: str, rainb0w_config_fil
         for user in rainb0w_users:
             if user["name"] == username:
                 print("=" * 60)
-                print("\n*********************** Xray REALITY ***********************")
-                print_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{username}/reality-url.txt")
-                gen_qrcode(
-                    load_txt_file(
+                if rainb0w_config["XRAY"]["IS_ENABLED"]:
+                    print(
+                        "\n*********************** Xray REALITY ***********************"
+                    )
+                    print_txt_file(
                         f"{CLIENT_CONFIG_FILES_DIR}/{username}/reality-url.txt"
                     )
-                )
-                print("\n*********************** MTProto ***********************")
-                print_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{username}/mtproto-url.txt")
-                gen_qrcode(
-                    load_txt_file(
+                    gen_qrcode(
+                        load_txt_file(
+                            f"{CLIENT_CONFIG_FILES_DIR}/{username}/reality-url.txt"
+                        )
+                    )
+                if rainb0w_config["MTPROTO"]["IS_ENABLED"]:
+                    print("\n*********************** MTProto ***********************")
+                    print_txt_file(
                         f"{CLIENT_CONFIG_FILES_DIR}/{username}/mtproto-url.txt"
                     )
-                )
-                print("\n*********************** Hysteria ***********************")
-                print_txt_file(f"{CLIENT_CONFIG_FILES_DIR}/{username}/hysteria-url.txt")
-                gen_qrcode(
-                    load_txt_file(
+                    gen_qrcode(
+                        load_txt_file(
+                            f"{CLIENT_CONFIG_FILES_DIR}/{username}/mtproto-url.txt"
+                        )
+                    )
+                if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
+                    print("\n*********************** Hysteria ***********************")
+                    print_txt_file(
                         f"{CLIENT_CONFIG_FILES_DIR}/{username}/hysteria-url.txt"
                     )
-                )
-                print(
-                    f"""
-    If your client does not support share links, configure it as the following:
+                    gen_qrcode(
+                        load_txt_file(
+                            f"{CLIENT_CONFIG_FILES_DIR}/{username}/hysteria-url.txt"
+                        )
+                    )
+                    print(
+                        f"""
+If your client does not support share links, configure it as the following:
 
-    Server:             {PUBLIC_IP}
-    Port:               {rainb0w_config['HYSTERIA']['PORT']}
-    Protocol:           UDP
-    SNI:                {rainb0w_config['CERT']['FAKE_SNI']}
-    ALPN:               {rainb0w_config['HYSTERIA']['ALPN']}
-    Obfuscation:        {rainb0w_config['HYSTERIA']['OBFS']}
-    Auth. Type:         BASE64
-    Payload:            {bytes_to_raw_str(base64.b64encode(user["password"].encode()))}
-    Allow Insecure:     Enabled
-    Max Upload:         YOUR REAL UPLOAD SPEED
-    Max Download:       YOUR REAL DOWNLOAD SPEED
-    QUIC Stream:        1677768
-    QUIC Conn.:         4194304
-    Disable Path MTU Discovery: Enabled
-        """
-                )
+Server:             {PUBLIC_IP}
+Port:               {rainb0w_config['HYSTERIA']['PORT']}
+Protocol:           UDP
+SNI:                {rainb0w_config['CERT']['FAKE_SNI']}
+ALPN:               {rainb0w_config['HYSTERIA']['ALPN']}
+Obfuscation:        {rainb0w_config['HYSTERIA']['OBFS']}
+Auth. Type:         BASE64
+Payload:            {bytes_to_raw_str(base64.b64encode(user["password"].encode()))}
+Allow Insecure:     Enabled
+Max Upload:         YOUR REAL UPLOAD SPEED
+Max Download:       YOUR REAL DOWNLOAD SPEED
+QUIC Stream:        1677768
+QUIC Conn.:         4194304
+Disable Path MTU Discovery: Enabled
+            """
+                    )
                 print("=" * 60)
                 print(
                     f"""\n
 You can also find these QRCodes and pre-configured client.json files for '{username}' at
-Xray REALITY:
-    - JSON:   [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/reality.json[/green]
-    - QRCODE: [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/reality-qrcode.png[/green]
-Hysteria:
-    - JSON:   [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/hysteria.json[/green]
-    - QRCODE: [green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/hysteria-qrcode.png[/green]
+[green]{CLIENT_CONFIG_FILES_DIR}/{user['name']}/[/green]
+
 You can use FTP clients, scp command, or even 'cat' them on the terminal and
 then copy and paste to a local json file to provide to your client apps.
 

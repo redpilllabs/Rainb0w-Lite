@@ -102,21 +102,9 @@ ip6tables -I FORWARD -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -j REJEC
 iptables -A OUTPUT -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -j REJECT
 ip6tables -A OUTPUT -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -j REJECT
 
-echo -e "${B_GREEN}>> Allow REALITY Port $1 ${RESET}"
-iptables -A INPUT -p tcp --dport $1 -m conntrack --ctstate NEW -m comment --comment "Allow REALITY" -j ACCEPT
-ip6tables -A INPUT -p tcp --dport $1 -m conntrack --ctstate NEW -m comment --comment "Allow REALITY" -j ACCEPT
-
-echo -e "${B_GREEN}>> Allow MTProto Port $2 ${RESET}"
-iptables -A INPUT -p tcp --dport $2 -m conntrack --ctstate NEW -m comment --comment "Allow MTProto" -j ACCEPT
-ip6tables -A INPUT -p tcp --dport $2 -m conntrack --ctstate NEW -m comment --comment "Allow MTProto" -j ACCEPT
-
-echo -e "${B_GREEN}>> Allow Hysteria Port $3 ${RESET}"
-iptables -A INPUT -p udp --dport $3 -m conntrack --ctstate NEW -m comment --comment "Allow Hysteria" -j ACCEPT
-ip6tables -A INPUT -p udp --dport $3 -m conntrack --ctstate NEW -m comment --comment "Allow Hysteria" -j ACCEPT
-
 echo -e "${B_GREEN}>> Drop invalid packets ${RESET}"
-iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
-ip6tables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A INPUT -m conntrack --ctstate INVALID -m comment --comment "Drop Invalid Packets" -j DROP
+ip6tables -A INPUT -m conntrack --ctstate INVALID -m comment --comment "Drop Invalid Packets" -j DROP
 
 echo -e "${B_GREEN}>> Setting chain's default policies${RESET}"
 iptables -P INPUT DROP

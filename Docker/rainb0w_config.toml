@@ -1,21 +1,23 @@
 # Rainb0w Lite config file
+VERSIONCODE=1.5
+
 [CERT]
 # This domain must be an accessible and well-known domain
 # also any active probing will be redirected there.
 FAKE_SNI = ""
 
-[REALITY]
-# REALITY Port (TCP)
+[XRAY]
+IS_ENABLED = false
 PORT = 443
 PRIVATE_KEY = ""
 PUBLIC_KEY = ""
 
 [HYSTERIA]
-# Hysteria Port (UDP)
+IS_ENABLED = false
 PORT = 443
 ALPN = ""
 OBFS = ""
 
 [MTPROTO]
-# MTPRoto Port (TCP)
+IS_ENABLED = false
 PORT = 993

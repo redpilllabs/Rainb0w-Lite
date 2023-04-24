@@ -11,10 +11,12 @@ from base.config import (
     MTPROTOPY_DOCKER_COMPOSE_FILE,
     RAINB0W_BACKUP_DIR,
     RAINB0W_CONFIG_FILE,
+    RAINB0W_HOME_DIR,
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
     XRAY_DOCKER_COMPOSE_FILE,
 )
+from pick import pick
 from proxy.hysteria import (
     configure_hysteria,
     prompt_hysteria_alpn,
@@ -30,32 +32,35 @@ from user.user_manager import (
     save_users,
 )
 from utils.cert_utils import prompt_fake_sni
-from utils.helper import copy_file, load_toml, progress_indicator, save_toml
+from utils.helper import copy_file, load_toml, progress_indicator, remove_dir, save_toml
 from utils.net_utils import prompt_port_number
 
 
 def apply_config():
     rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
 
-    configure_xray_reality(
-        rainb0w_config["REALITY"],
-        rainb0w_config["CERT"],
-        XRAY_CONFIG_FILE,
-        XRAY_DOCKER_COMPOSE_FILE,
-    )
+    if rainb0w_config["XRAY"]["IS_ENABLED"]:
+        configure_xray_reality(
+            rainb0w_config["XRAY"],
+            rainb0w_config["CERT"],
+            XRAY_CONFIG_FILE,
+            XRAY_DOCKER_COMPOSE_FILE,
+        )
 
-    configure_hysteria(
-        rainb0w_config["HYSTERIA"],
-        HYSTERIA_CONFIG_FILE,
-        HYSTERIA_DOCKER_COMPOSE_FILE,
-    )
+    if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
+        configure_hysteria(
+            rainb0w_config["HYSTERIA"],
+            HYSTERIA_CONFIG_FILE,
+            HYSTERIA_DOCKER_COMPOSE_FILE,
+        )
 
-    configure_mtproto(
-        rainb0w_config["MTPROTO"],
-        rainb0w_config["CERT"],
-        MTPROTOPY_CONFIG_FILE,
-        MTPROTOPY_DOCKER_COMPOSE_FILE,
-    )
+    if rainb0w_config["MTPROTO"]["IS_ENABLED"]:
+        configure_mtproto(
+            rainb0w_config["MTPROTO"],
+            rainb0w_config["CERT"],
+            MTPROTOPY_CONFIG_FILE,
+            MTPROTOPY_DOCKER_COMPOSE_FILE,
+        )
 
     # Add users from the rainb0w_users.toml into proxies
     rainb0w_users = get_users(RAINB0W_USERS_FILE)
@@ -96,36 +101,71 @@ def configure():
     tcp_ports = set()
     udp_ports = set()
 
-    progress_indicator(1, 7, "Fake SNI")
+    title = "Select the proxies you'd like to deploy [Press 'Space' to mark]:"
+    options = ["Xray REALITY", "MTProto", "Hysteria"]
+
+    selected = pick(options, title, multiselect=True, min_selection_count=1)
+    selected = [item[0] for item in selected]  # type: ignore
+
+    # We need 2 steps regardless of proxy choice,
+    #  one for the fake sni and one for username prompt
+    total_steps = 2
+    # Add steps as many needed for the selection
+    total_steps += len(selected)
+    # Hysteria requires two more steps (ALPN and obfs)
+    if "Hysteria" in selected:
+        total_steps += 2
+
+    curr_step = 1
+
+    progress_indicator(curr_step, total_steps, "Fake SNI")
     rainb0w_config["CERT"]["FAKE_SNI"] = prompt_fake_sni()
+    curr_step += 1
 
-    progress_indicator(2, 7, "REALITY Port")
-    rainb0w_config["REALITY"]["PORT"], tcp_ports = prompt_port_number(
-        "REALITY", "TCP", tcp_ports
-    )
+    if "Xray REALITY" in selected:
+        progress_indicator(curr_step, total_steps, "REALITY Port")
+        rainb0w_config["XRAY"]["PORT"], tcp_ports = prompt_port_number(
+            "REALITY", "TCP", tcp_ports
+        )
+        rainb0w_config["XRAY"]["IS_ENABLED"] = True
+        curr_step += 1
+    else:
+        remove_dir(f"{RAINB0W_HOME_DIR}/xray")
 
-    progress_indicator(3, 7, "MTProto Port")
-    rainb0w_config["MTPROTO"]["PORT"], tcp_ports = prompt_port_number(
-        "MTProto", "TCP", tcp_ports
-    )
+    if "MTProto" in selected:
+        progress_indicator(curr_step, total_steps, "MTProto Port")
+        rainb0w_config["MTPROTO"]["PORT"], tcp_ports = prompt_port_number(
+            "MTProto", "TCP", tcp_ports
+        )
+        rainb0w_config["MTPROTO"]["IS_ENABLED"] = True
+        curr_step += 1
+    else:
+        remove_dir(f"{RAINB0W_HOME_DIR}/mtprotopy")
 
-    progress_indicator(4, 7, "Hysteria Port")
-    rainb0w_config["HYSTERIA"]["PORT"], udp_ports = prompt_port_number(
-        "Hysteria", "UDP", udp_ports
-    )
+    if "Hysteria" in selected:
+        progress_indicator(curr_step, total_steps, "Hysteria Port")
+        rainb0w_config["HYSTERIA"]["PORT"], udp_ports = prompt_port_number(
+            "Hysteria", "UDP", udp_ports
+        )
+        rainb0w_config["HYSTERIA"]["IS_ENABLED"] = True
+        curr_step += 1
 
-    progress_indicator(5, 7, "Hysteria Obfuscation")
-    obfs = prompt_hysteria_obfs()
-    if obfs:
-        rainb0w_config["HYSTERIA"]["OBFS"] = obfs
+        progress_indicator(curr_step, total_steps, "Hysteria Obfuscation")
+        obfs = prompt_hysteria_obfs()
+        if obfs:
+            rainb0w_config["HYSTERIA"]["OBFS"] = obfs
+        curr_step += 1
 
-    progress_indicator(6, 7, "Hysteria ALPN")
-    alpn = prompt_hysteria_alpn()
-    if alpn:
-        rainb0w_config["HYSTERIA"]["ALPN"] = alpn
+        progress_indicator(curr_step, total_steps, "Hysteria ALPN")
+        alpn = prompt_hysteria_alpn()
+        if alpn:
+            rainb0w_config["HYSTERIA"]["ALPN"] = alpn
+        curr_step += 1
+    else:
+        remove_dir(f"{RAINB0W_HOME_DIR}/hysteria")
 
     # Finally prompt for a username
-    progress_indicator(7, 7, "User Management")
+    progress_indicator(curr_step, total_steps, "User Management")
     username = prompt_username()
 
     # Generate a user object with the given name and save it to users file
