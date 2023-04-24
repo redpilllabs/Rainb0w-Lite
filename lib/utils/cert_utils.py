@@ -23,7 +23,10 @@ def extract_domain(domain: str) -> str:
         return domain
 
 
-# TODO: Implement .ir regex check
+def is_ir_domain(input: str) -> bool:
+    return bool(re.search(r"\.ir$", input))
+
+
 def prompt_fake_sni() -> str:
     print(
         """
@@ -39,11 +42,19 @@ connections to Iranian IPs are blocked with this script!
     """
     )
     fake_sni = input("\nEnter a fake SNI: ")
-    while not (is_domain(fake_sni) or is_subdomain(fake_sni)):
-        print(
-            "\nInvalid domain name! Please enter in any of these formats [example.com, sub.example.com]"
-        )
-        fake_sni = input("Enter a fake SNI: ")
+    while True:
+        if not (is_domain(fake_sni) or is_subdomain(fake_sni)):
+            print(
+                "\nInvalid domain name! Please enter in any of these formats [example.com, sub.example.com]"
+            )
+            fake_sni = input("Enter a fake SNI: ")
+        elif is_ir_domain(fake_sni):
+            print(
+                "\nDomain names with the [.ir] TLD are not accepted since outgoing connections to Iranian IPs are blocked with this script! Please enter another domain name."
+            )
+            fake_sni = input("Enter a fake SNI: ")
+        else:
+            break
 
     return fake_sni
 
