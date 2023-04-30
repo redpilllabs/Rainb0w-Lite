@@ -1,15 +1,8 @@
 import urllib.parse
 
 from base.config import CLIENT_CONFIG_FILES_DIR
-from utils.helper import (
-    bytes_to_hex,
-    bytes_to_url_safe_base64,
-    load_toml,
-    load_yaml,
-    save_toml,
-    save_yaml,
-    write_txt_file,
-)
+from utils.helper import (bytes_to_hex, bytes_to_url_safe_base64, load_toml,
+                          load_yaml, save_toml, save_yaml, write_txt_file)
 
 # MTProtoPy users are loaded directly from 'rainb0w_users.toml'
 
@@ -27,7 +20,7 @@ def configure_mtproto(
     mtproto_config["mtproto"]["mask_host"] = cert_config["FAKE_SNI"]
     mtproto_config["mtproto"]["sni"] = cert_config["FAKE_SNI"]
     mtproto_config["server"]["port"] = proxy_config["PORT"]
-    mtproto_docker_compose["services"]["mtprotopy"]["ports"] = [
+    mtproto_docker_compose["services"]["mtproto"]["ports"] = [
         f"{proxy_config['PORT']}:{proxy_config['PORT']}"
     ]
 
