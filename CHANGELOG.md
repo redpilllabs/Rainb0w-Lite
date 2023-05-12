@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.6
+
+- Disable port prompts for all proxies and set them to their best known operating ports
+- Fix REALITY client links compatibility with NekoBox
+- Disable logs for more privacy
+
 ## Version 1.5
 
 THIS RELEASE HAS BREAKING CHANGES, YOU SHOULD DO A FRESH INSTALL
