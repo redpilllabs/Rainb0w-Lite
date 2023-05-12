@@ -112,6 +112,12 @@ echo -e "${B_GREEN}>> Allow port 993/tcp for MTProto ${RESET}"
 iptables -A INPUT -p tcp --dport 993 -m conntrack --ctstate NEW -m comment --comment "Allow MTProto" -j ACCEPT
 ip6tables -A INPUT -p tcp --dport 993 -m conntrack --ctstate NEW -m comment --comment "Allow MTProto" -j ACCEPT
 
+echo -e "${B_GREEN}>> Allow port 443/udp and 8443/udp for Hysteria ${RESET}"
+iptables -A INPUT -p udp --dport 443 -m conntrack --ctstate NEW -m comment --comment "Allow Hysteria (443)" -j ACCEPT
+ip6tables -A INPUT -p udp --dport 443 -m conntrack --ctstate NEW -m comment --comment "Allow Hysteria (443)" -j ACCEPT
+iptables -A INPUT -p udp --dport 8443 -m conntrack --ctstate NEW -m comment --comment "Allow Hysteria (8443)" -j ACCEPT
+ip6tables -A INPUT -p udp --dport 8443 -m conntrack --ctstate NEW -m comment --comment "Allow Hysteria (8443)" -j ACCEPT
+
 echo -e "${B_GREEN}>> Drop invalid packets ${RESET}"
 iptables -A INPUT -m conntrack --ctstate INVALID -m comment --comment "Drop Invalid Packets" -j DROP
 ip6tables -A INPUT -m conntrack --ctstate INVALID -m comment --comment "Drop Invalid Packets" -j DROP

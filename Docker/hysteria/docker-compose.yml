@@ -7,6 +7,7 @@ services:
     networks:
       - proxy
     ports:
+      - "443:443/udp"
       - "8443:8443/udp"
     volumes:
       - /etc/ssl/certs/selfsigned.crt:/etc/ssl/certs/selfsigned.crt:ro

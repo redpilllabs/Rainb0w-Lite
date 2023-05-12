@@ -14,7 +14,7 @@ PUBLIC_KEY = ""
 
 [HYSTERIA]
 IS_ENABLED = false
-PORT = 443
+PORT = 8443
 ALPN = ""
 OBFS = ""
 

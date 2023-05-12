@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import os
+import random
 import signal
 import sys
 
+from pick import pick
+
 from base.config import (
     HYSTERIA_CONFIG_FILE,
-    HYSTERIA_DOCKER_COMPOSE_FILE,
     MTPROTOPY_CONFIG_FILE,
     RAINB0W_BACKUP_DIR,
     RAINB0W_CONFIG_FILE,
@@ -14,12 +16,7 @@ from base.config import (
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
 )
-from pick import pick
-from proxy.hysteria import (
-    configure_hysteria,
-    prompt_hysteria_alpn,
-    prompt_hysteria_obfs,
-)
+from proxy.hysteria import configure_hysteria
 from proxy.mtproto import configure_mtproto
 from proxy.xray import configure_xray_reality
 from user.user_manager import (
@@ -30,8 +27,14 @@ from user.user_manager import (
     save_users,
 )
 from utils.cert_utils import prompt_fake_sni
-from utils.helper import copy_file, load_toml, progress_indicator, remove_dir, save_toml
-from utils.net_utils import prompt_port_number
+from utils.helper import (
+    copy_file,
+    gen_random_string,
+    load_toml,
+    progress_indicator,
+    remove_dir,
+    save_toml,
+)
 
 
 def apply_config():
@@ -48,7 +51,6 @@ def apply_config():
         configure_hysteria(
             rainb0w_config["HYSTERIA"],
             HYSTERIA_CONFIG_FILE,
-            HYSTERIA_DOCKER_COMPOSE_FILE,
         )
 
     if rainb0w_config["MTPROTO"]["IS_ENABLED"]:
@@ -94,8 +96,6 @@ def restore_config():
 
 def configure():
     rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
-    tcp_ports = set()
-    udp_ports = set()
 
     title = "Select the proxies you'd like to deploy [Press 'Space' to mark]:"
     options = ["Xray REALITY", "MTProto", "Hysteria"]
@@ -106,11 +106,9 @@ def configure():
     # We need 2 steps regardless of proxy choice,
     #  one for the fake sni and one for username prompt
     total_steps = 2
-    # Add steps as many needed for the selection
-    total_steps += len(selected)
     # Hysteria requires two more steps (ALPN and obfs)
     if "Hysteria" in selected:
-        total_steps += 2
+        total_steps += 1
 
     curr_step = 1
 
@@ -125,28 +123,25 @@ def configure():
 
     if "MTProto" in selected:
         rainb0w_config["MTPROTO"]["IS_ENABLED"] = True
-        curr_step += 1
     else:
         remove_dir(f"{RAINB0W_HOME_DIR}/mtprotopy")
 
     if "Hysteria" in selected:
-        progress_indicator(curr_step, total_steps, "Hysteria Port")
-        rainb0w_config["HYSTERIA"]["PORT"], udp_ports = prompt_port_number(
-            "Hysteria", "UDP", udp_ports
-        )
+        progress_indicator(curr_step, total_steps, "Hysteria Mode")
+        title = "Select Hysteria running mode:"
+        options = ["Raw Obfuscated UDP [Recommended]", "Normal QUIC"]
+
+        option, _ = pick(options, title)
+        if option == "Raw Obfuscated UDP [Recommended]":
+            rainb0w_config["HYSTERIA"]["PORT"] = 8443
+            rainb0w_config["HYSTERIA"]["OBFS"] = gen_random_string(
+                random.randint(8, 12)
+            )
+        elif option == "Normal QUIC":
+            rainb0w_config["HYSTERIA"]["PORT"] = 443
+            rainb0w_config["HYSTERIA"]["ALPN"] = "h3"
+
         rainb0w_config["HYSTERIA"]["IS_ENABLED"] = True
-        curr_step += 1
-
-        progress_indicator(curr_step, total_steps, "Hysteria Obfuscation")
-        obfs = prompt_hysteria_obfs()
-        if obfs:
-            rainb0w_config["HYSTERIA"]["OBFS"] = obfs
-        curr_step += 1
-
-        progress_indicator(curr_step, total_steps, "Hysteria ALPN")
-        alpn = prompt_hysteria_alpn()
-        if alpn:
-            rainb0w_config["HYSTERIA"]["ALPN"] = alpn
         curr_step += 1
     else:
         remove_dir(f"{RAINB0W_HOME_DIR}/hysteria")

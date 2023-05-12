@@ -43,9 +43,6 @@ python3 $PWD/lib/shell/helper/get_proxy_status.py "hysteria"
 PYTHON_EXIT_CODE=$?
 if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     HYSTERIA_ENABLED=true
-    output=$(python3 $PWD/lib/shell/helper/get_port.py "hysteria")
-    hysteria_port=$(echo $output | awk -F'[ :]' '{print $1}')
-    source $PWD/lib/shell/access_control/allow_port.sh "Hysteria" $hysteria_port "udp"
 
     # Generate a self-signed x509 certificate for Hysteria
     output=$(python3 $PWD/lib/shell/helper/get_cert_info.py)
