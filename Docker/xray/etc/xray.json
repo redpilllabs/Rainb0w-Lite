@@ -44,7 +44,7 @@
                     "serverNames": [],
                     "privateKey": "",
                     "minClientVer": "1.8.0",
-                    "maxTimeDiff": 0,
+                    "maxTimeDiff": 60000,
                     "shortIds": []
                 }
             }
