@@ -4,6 +4,8 @@ import os
 import signal
 import sys
 
+from pick import pick
+
 from base.config import (
     HYSTERIA_CONFIG_FILE,
     HYSTERIA_DOCKER_COMPOSE_FILE,
@@ -14,9 +16,7 @@ from base.config import (
     RAINB0W_HOME_DIR,
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
-    XRAY_DOCKER_COMPOSE_FILE,
 )
-from pick import pick
 from proxy.hysteria import (
     configure_hysteria,
     prompt_hysteria_alpn,
@@ -44,7 +44,6 @@ def apply_config():
             rainb0w_config["XRAY"],
             rainb0w_config["CERT"],
             XRAY_CONFIG_FILE,
-            XRAY_DOCKER_COMPOSE_FILE,
         )
 
     if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
@@ -123,12 +122,7 @@ def configure():
     curr_step += 1
 
     if "Xray REALITY" in selected:
-        progress_indicator(curr_step, total_steps, "REALITY Port")
-        rainb0w_config["XRAY"]["PORT"], tcp_ports = prompt_port_number(
-            "REALITY", "TCP", tcp_ports
-        )
         rainb0w_config["XRAY"]["IS_ENABLED"] = True
-        curr_step += 1
     else:
         remove_dir(f"{RAINB0W_HOME_DIR}/xray")
 

@@ -29,9 +29,6 @@ python3 $PWD/lib/shell/helper/get_proxy_status.py "xray"
 PYTHON_EXIT_CODE=$?
 if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     REALITY_ENABLED=true
-    output=$(python3 $PWD/lib/shell/helper/get_port.py "xray")
-    reality_port=$(echo $output | awk -F'[ :]' '{print $1}')
-    source $PWD/lib/shell/access_control/allow_port.sh "REALITY" $reality_port "tcp"
     fn_restart_docker_container "xray"
 fi
 

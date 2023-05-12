@@ -4,7 +4,7 @@ from base.config import (
     XRAY_CLIENT_TEMPLATE_CONFIG_FILE,
 )
 from utils.cert_utils import is_subdomain
-from utils.helper import load_json, load_yaml, save_json, save_yaml, write_txt_file
+from utils.helper import load_json, save_json, write_txt_file
 
 
 def xray_add_user(user_info: dict, xray_config_file: str):
@@ -40,16 +40,9 @@ def configure_xray_reality(
     proxy_config: dict,
     cert_config: dict,
     xray_config_file: str,
-    xray_docker_compose_file: str,
 ):
     print("Configuring Xray...")
     xray_config = load_json(xray_config_file)
-    xray_docker_compose = load_yaml(xray_docker_compose_file)
-
-    xray_config["inbounds"][0]["port"] = int(proxy_config["PORT"])
-    xray_docker_compose["services"]["xray"]["ports"] = [
-        f"{proxy_config['PORT']}:{proxy_config['PORT']}"
-    ]
 
     xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
         "privateKey"
@@ -69,7 +62,6 @@ def configure_xray_reality(
         ].append(f"www.{cert_config['FAKE_SNI']}")
 
     save_json(xray_config, xray_config_file)
-    save_yaml(xray_docker_compose, xray_docker_compose_file)
 
 
 def configure_xray_reality_client(
