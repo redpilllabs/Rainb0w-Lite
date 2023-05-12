@@ -36,9 +36,6 @@ python3 $PWD/lib/shell/helper/get_proxy_status.py "mtproto"
 PYTHON_EXIT_CODE=$?
 if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     MTPROTO_ENABLED=true
-    output=$(python3 $PWD/lib/shell/helper/get_port.py "mtproto")
-    mtproto_port=$(echo $output | awk -F'[ :]' '{print $1}')
-    source $PWD/lib/shell/access_control/allow_port.sh "MTProto" $mtproto_port "tcp"
     fn_restart_docker_container "mtproto"
 fi
 

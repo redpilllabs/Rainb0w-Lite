@@ -4,19 +4,17 @@ import os
 import signal
 import sys
 
-from pick import pick
-
 from base.config import (
     HYSTERIA_CONFIG_FILE,
     HYSTERIA_DOCKER_COMPOSE_FILE,
     MTPROTOPY_CONFIG_FILE,
-    MTPROTOPY_DOCKER_COMPOSE_FILE,
     RAINB0W_BACKUP_DIR,
     RAINB0W_CONFIG_FILE,
     RAINB0W_HOME_DIR,
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
 )
+from pick import pick
 from proxy.hysteria import (
     configure_hysteria,
     prompt_hysteria_alpn,
@@ -58,7 +56,6 @@ def apply_config():
             rainb0w_config["MTPROTO"],
             rainb0w_config["CERT"],
             MTPROTOPY_CONFIG_FILE,
-            MTPROTOPY_DOCKER_COMPOSE_FILE,
         )
 
     # Add users from the rainb0w_users.toml into proxies
@@ -127,10 +124,6 @@ def configure():
         remove_dir(f"{RAINB0W_HOME_DIR}/xray")
 
     if "MTProto" in selected:
-        progress_indicator(curr_step, total_steps, "MTProto Port")
-        rainb0w_config["MTPROTO"]["PORT"], tcp_ports = prompt_port_number(
-            "MTProto", "TCP", tcp_ports
-        )
         rainb0w_config["MTPROTO"]["IS_ENABLED"] = True
         curr_step += 1
     else:
