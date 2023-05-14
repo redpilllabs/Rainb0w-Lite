@@ -20,4 +20,4 @@ OBFS = ""
 
 [MTPROTO]
 IS_ENABLED = false
-PORT = 993
+PORT = 9443
