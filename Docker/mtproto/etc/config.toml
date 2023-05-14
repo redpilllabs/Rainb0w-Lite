@@ -2,7 +2,7 @@ title = "MTProtoPy Configuration"
 
 [server]
 # Listening port for incoming connections
-port = 993
+port = 9443
 # If you have a domain name you can insert below so that share urls (tg://..) include a domain name
 # otherwise leave blank and your server's public IP will be inserted
 domain = ""
@@ -18,7 +18,7 @@ mask = true
 # The next host to forward bad clients
 mask_host = "MTPROTO_FAKE_SNI"
 # The next host's port to forward bad clients
-mask_port = 443
+mask_port = 9443
 
 
 [proxy]
