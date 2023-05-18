@@ -24,8 +24,8 @@ else
             echo "Your version of Ubuntu is not supported! Only 20.04 and 22.04 versions are supported."
             exit 0
         else
-            echo -e "${B_GREEN}Purging Snap to free up some memory...${RESET}"
-            apt purge snapd -y
+            # Purging Snap to free up some memory...
+            fn_check_and_remove_pkg snapd
             systemctl daemon-reload
         fi
     elif [[ "$DISTRO" =~ "Debian GNU/Linux" ]]; then
@@ -60,16 +60,24 @@ if [ "$EUID" -ne 0 ]; then
     exit
 fi
 
-MEMORY_SIZE=$(free -m | awk '/Mem:/ { print $2 }')
-if [ $MEMORY_SIZE -lt 512 ]; then
-    echo -e "${B_YELLOW}You seem to be short on memory! Installing Zram to optimize memory...${RESET}"
-    source $PWD/lib/shell/performance/enable_zram.sh
-fi
-
-# Install pre-requisites
+# Install packages
 if [ ! -d "$HOME/Rainb0w_Lite_Home" ]; then
-    fn_install_python_packages
-    clear
+    MEMORY_SIZE=$(free -m | awk '/Mem:/ { print $2 }')
+    if [ $MEMORY_SIZE -lt 512 ]; then
+        local IS_INSTALLED=$(fn_check_for_pkg zram-tools)
+        if [ $IS_INSTALLED = false ]; then
+            echo -e "${B_YELLOW}You seem to be short on memory! Installing Zram to optimize memory...${RESET}"
+            source $PWD/lib/shell/performance/enable_zram.sh
+        fi
+    fi
+    # Install required packages
+    fn_install_required_packages
+    # Install xtables geoip
+    source $PWD/lib/shell/os/install_xt_geoip.sh
+    # Install Docker
+    source $PWD/lib/shell/os/install_docker.sh
+    # Reboot if needed
+    source $PWD/lib/shell/os/check_reboot_required.sh
 fi
 
 function clear_and_copy_files() {
@@ -152,4 +160,5 @@ function main() {
     fi
 }
 
+clear
 main

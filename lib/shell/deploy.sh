@@ -5,10 +5,10 @@ source $PWD/lib/shell/text/text_utils.sh
 source $PWD/lib/shell/os/os_utils.sh
 source $PWD/lib/shell/docker/docker_utils.sh
 
-# Install Docker and required packages
-source $PWD/lib/shell/os/install_docker.sh
+# Create Docker network
 source $PWD/lib/shell/docker/init_vol_net.sh
-source $PWD/lib/shell/os/install_xt_geoip.sh
+
+CONTAINERS=($(ls -d "$HOME/Rainb0w_Lite_Home/"*/ | sed 's;^'"$HOME/Rainb0w_Lite_Home/"'\(.*\)/;\1;' | sed '/^clients$/d' | sed '/^blocky$/d'))
 
 # Apply Kernel's network stack optimizations
 source $PWD/lib/shell/performance/tune_kernel_net.sh
@@ -16,28 +16,25 @@ source $PWD/lib/shell/performance/tune_kernel_net.sh
 # Setup firewall with necessary protections
 source $PWD/lib/shell/access_control/setup_firewall.sh
 
-# Disable DNS stub listener to free up the port 53 for blocky
-source $PWD/lib/shell/os/disable_dns_stub_listener.sh
-# Start blocky since we need DNS
-fn_restart_docker_container "blocky"
+# Check if user selected proxies that need DNS support
+if printf '%s\n' "${CONTAINERS[@]}" | grep -q -E "xray|hysteria"; then
+    # Disable DNS stub listener to free up the port 53 for blocky DNS
+    source $PWD/lib/shell/os/disable_dns_stub_listener.sh
+    # Start blocky since we need DNS
+    fn_restart_docker_container "blocky"
+fi
 
-python3 $PWD/lib/shell/helper/get_proxy_status.py "xray"
-PYTHON_EXIT_CODE=$?
-if [ $PYTHON_EXIT_CODE -ne 0 ]; then
+if [[ " ${CONTAINERS[@]} " =~ "xray" ]]; then
     REALITY_ENABLED=true
     fn_restart_docker_container "xray"
 fi
 
-python3 $PWD/lib/shell/helper/get_proxy_status.py "mtproto"
-PYTHON_EXIT_CODE=$?
-if [ $PYTHON_EXIT_CODE -ne 0 ]; then
+if [[ " ${CONTAINERS[@]} " =~ "mtproto" ]]; then
     MTPROTO_ENABLED=true
     fn_restart_docker_container "mtproto"
 fi
 
-python3 $PWD/lib/shell/helper/get_proxy_status.py "hysteria"
-PYTHON_EXIT_CODE=$?
-if [ $PYTHON_EXIT_CODE -ne 0 ]; then
+if [[ " ${CONTAINERS[@]} " =~ "hysteria" ]]; then
     HYSTERIA_ENABLED=true
 
     # Generate a self-signed x509 certificate for Hysteria

@@ -17,11 +17,22 @@ function fn_check_and_install_pkg() {
     fi
 }
 
-function fn_install_python_packages() {
+function fn_check_and_remove_pkg() {
+    local IS_INSTALLED=$(fn_check_for_pkg $1)
+    if [ $IS_INSTALLED = true ]; then
+        echo -e "${B_GREEN}>> Removing '$1'... ${RESET}"
+        apt remove -y $1
+        apt autoremove -y
+    fi
+}
+
+function fn_install_required_packages() {
     echo -e "${B_GREEN}>> Checking for requried Python packages${RESET}"
-    apt update && apt upgrade -y
+    source $PWD/lib/shell/os/upgrade_os.sh
+    fn_check_and_install_pkg build-essential
     fn_check_and_install_pkg autoconf
     fn_check_and_install_pkg pkg-config
+    fn_check_and_install_pkg dkms
     fn_check_and_install_pkg curl
     fn_check_and_install_pkg unzip
     fn_check_and_install_pkg python3-pip
