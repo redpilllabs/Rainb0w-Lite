@@ -17,4 +17,5 @@ if [ ! -f "/etc/systemd/resolved.conf.d/nostublistener.conf" ]; then
     mv /etc/resolv.conf /etc/resolv.conf.backup
     ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
     systemctl reload-or-restart systemd-resolved
+    sleep 5
 fi
