@@ -54,6 +54,12 @@ if [ "$EUID" -ne 0 ]; then
     exit
 fi
 
+MEMORY_SIZE=$(free -m | awk '/Mem:/ { print $2 }')
+if [ $MEMORY_SIZE -lt 512 ]; then
+    echo -e "${B_YELLOW}You seem to be short on memory! Installing Zram to optimize memory...${RESET}"
+    source $PWD/lib/shell/performance/enable_zram.sh
+fi
+
 # Install pre-requisites
 if [ ! -d "$HOME/Rainb0w_Lite_Home" ]; then
     fn_install_python_packages
