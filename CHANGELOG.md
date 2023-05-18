@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.7
+
+- Fix Docker network init with newer Docker versions
+- Do not deploy DNS resolver if only MTProto is selected
+- Skip annoying dialog prompts
+- Enable Zram swap on server with 512M and lower memory
+
 ## Version 1.6
 
 - Disable port prompts for all proxies and set them to their best known operating ports
