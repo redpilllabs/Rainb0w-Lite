@@ -6,10 +6,6 @@ source $PWD/lib/shell/os/os_utils.sh
 source $PWD/lib/shell/docker/docker_utils.sh
 
 # Install Docker and required packages
-fn_check_and_install_pkg openssl
-fn_check_and_install_pkg bc
-fn_check_and_install_pkg logrotate
-fn_check_and_install_pkg iptables-persistent
 source $PWD/lib/shell/os/install_docker.sh
 source $PWD/lib/shell/docker/init_vol_net.sh
 source $PWD/lib/shell/os/install_xt_geoip.sh

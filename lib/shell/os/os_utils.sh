@@ -20,9 +20,15 @@ function fn_check_and_install_pkg() {
 function fn_install_python_packages() {
     echo -e "${B_GREEN}>> Checking for requried Python packages${RESET}"
     apt update && apt upgrade -y
+    fn_check_and_install_pkg autoconf
+    fn_check_and_install_pkg pkg-config
     fn_check_and_install_pkg curl
     fn_check_and_install_pkg unzip
     fn_check_and_install_pkg python3-pip
     fn_check_and_install_pkg qrencode
+    fn_check_and_install_pkg openssl
+    fn_check_and_install_pkg bc
+    fn_check_and_install_pkg logrotate
+    fn_check_and_install_pkg iptables-persistent
     pip3 install --quiet -r $PWD/requirements.txt
 }
