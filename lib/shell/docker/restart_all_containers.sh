@@ -2,8 +2,7 @@
 source $PWD/lib/shell/base/colors.sh
 source $PWD/lib/shell/docker/docker_utils.sh
 
-fn_restart_docker_container "blocky"
-CONTAINERS=("xray" "hysteria" "mtproto")
+CONTAINERS=("blocky" "xray" "hysteria" "mtproto")
 for container in "${CONTAINERS[@]}"; do
     python3 $PWD/lib/shell/helper/get_proxy_status.py $container
     PYTHON_EXIT_CODE=$?

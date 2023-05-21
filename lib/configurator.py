@@ -114,6 +114,12 @@ def configure():
     if "MTProto" in selected and "Xray REALITY" in selected:
         total_steps += 1
 
+    if "Xray REALITY" not in selected and "Hysteria" not in selected:
+        rainb0w_config["BLOCKY"]["IS_ENABLED"] = False
+        remove_dir(f"{RAINB0W_HOME_DIR}/blocky")
+    else:
+        rainb0w_config["BLOCKY"]["IS_ENABLED"] = True
+
     curr_step = 1
 
     progress_indicator(curr_step, total_steps, "Fake SNI")

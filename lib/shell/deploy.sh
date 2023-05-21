@@ -8,8 +8,6 @@ source $PWD/lib/shell/docker/docker_utils.sh
 # Create Docker network
 source $PWD/lib/shell/docker/init_vol_net.sh
 
-CONTAINERS=($(ls -d "$HOME/Rainb0w_Lite_Home/"*/ | sed 's;^'"$HOME/Rainb0w_Lite_Home/"'\(.*\)/;\1;' | sed '/^clients$/d' | sed '/^blocky$/d'))
-
 # Apply Kernel's network stack optimizations
 source $PWD/lib/shell/performance/tune_kernel_net.sh
 
@@ -17,27 +15,34 @@ source $PWD/lib/shell/performance/tune_kernel_net.sh
 source $PWD/lib/shell/access_control/setup_firewall.sh
 
 # Check if user selected proxies that need DNS support
-if printf '%s\n' "${CONTAINERS[@]}" | grep -q -E "xray|hysteria"; then
+python3 $PWD/lib/shell/helper/get_proxy_status.py "blocky"
+PYTHON_EXIT_CODE=$?
+if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     # Disable DNS stub listener to free up the port 53 for blocky DNS
     source $PWD/lib/shell/os/disable_dns_stub_listener.sh
-    # Start blocky since we need DNS
     fn_restart_docker_container "blocky"
 fi
 
-if [[ " ${CONTAINERS[@]} " =~ "xray" ]]; then
+python3 $PWD/lib/shell/helper/get_proxy_status.py "xray"
+PYTHON_EXIT_CODE=$?
+if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     source $PWD/lib/shell/access_control/allow_port_xray.sh
     fn_restart_docker_container "xray"
     REALITY_ENABLED=true
 fi
 
-if [[ " ${CONTAINERS[@]} " =~ "mtproto" ]]; then
+python3 $PWD/lib/shell/helper/get_proxy_status.py "mtproto"
+PYTHON_EXIT_CODE=$?
+if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     mtproto_extra_port=$(python3 $PWD/lib/shell/helper/get_mtproto_extra_port.py)
-    bash $PWD/lib/shell/access_control/allow_port_mtproto.sh $mtproto_extra_port
+    source $PWD/lib/shell/access_control/allow_port_mtproto.sh $mtproto_extra_port
     fn_restart_docker_container "mtproto"
     MTPROTO_ENABLED=true
 fi
 
-if [[ " ${CONTAINERS[@]} " =~ "hysteria" ]]; then
+python3 $PWD/lib/shell/helper/get_proxy_status.py "hysteria"
+PYTHON_EXIT_CODE=$?
+if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     hysteria_mode=$(python3 $PWD/lib/shell/helper/get_hysteria_mode.py)
     source $PWD/lib/shell/access_control/allow_port_hysteria.sh "$hysteria_mode"
 

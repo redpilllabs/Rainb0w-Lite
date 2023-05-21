@@ -22,3 +22,8 @@ OBFS = ""
 IS_ENABLED = false
 PORT = 993
 EXTRA_PORT = 0
+
+
+[BLOCKY]
+IS_ENABLED = false
+PORT = 53
