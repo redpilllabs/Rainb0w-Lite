@@ -23,10 +23,6 @@ else
         if [ ! "$DISTRO_VERSION" == "20.04" ] && [ ! "$DISTRO_VERSION" == "22.04" ]; then
             echo "Your version of Ubuntu is not supported! Only 20.04 and 22.04 versions are supported."
             exit 0
-        else
-            # Purging Snap to free up some memory...
-            fn_check_and_remove_pkg snapd
-            systemctl daemon-reload
         fi
     elif [[ "$DISTRO" =~ "Debian GNU/Linux" ]]; then
         if [ ! "$DISTRO_VERSION" == "11" ]; then
