@@ -145,6 +145,10 @@ def configure():
         else:
             rainb0w_config["MTPROTO"]["EXTRA_PORT"] = 443
 
+        progress_indicator(curr_step, total_steps, "MTProto AdTag")
+        adtag = prompt_mtproto_adtag()
+        change_mtproto_adtag(RAINB0W_CONFIG_FILE, MTPROTOPY_CONFIG_FILE, adtag)
+        curr_step += 1
     else:
         remove_dir(f"{RAINB0W_HOME_DIR}/mtproto")
 

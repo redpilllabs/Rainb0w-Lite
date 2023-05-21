@@ -19,7 +19,7 @@ from base.config import (
 )
 from pick import pick
 from proxy.blocky import disable_porn_dns_blocking, enable_porn_dns_blocking
-from proxy.mtproto import reset_mtproto_sni
+from proxy.mtproto import change_mtproto_adtag, prompt_mtproto_adtag, reset_mtproto_sni
 from proxy.xray import reset_xray_sni
 from rich import print
 from user.user_manager import (
@@ -126,6 +126,27 @@ def performance_menu():
         run_system_cmd([f"{os.getcwd()}/lib/shell/performance/disable_zram.sh"])
         prompt_clear_screen()
         performance_menu()
+    dashboard()
+
+
+def mtproto_menu():
+    global NEED_SERVICE_RESTART
+
+    title = "Select any option:"
+    options = [
+        "Change/Remove AdTag",
+        "Back to Main Menu",
+    ]
+    option, _ = pick(options, title)
+    if option == "Change/Remove AdTag":
+        clear_screen()
+        adtag = prompt_mtproto_adtag()
+        change_mtproto_adtag(RAINB0W_CONFIG_FILE, MTPROTOPY_CONFIG_FILE, adtag)
+        NEED_SERVICE_RESTART = True
+        print(
+            "Changes only take effect after selecting 'Apply Changes' in the dashboard!"
+        )
+        prompt_clear_screen()
     dashboard()
 
 
@@ -292,6 +313,7 @@ def dashboard():
     options = [
         "SNI Settings",
         "Performance Settings",
+        "MTProto Settings",
         "Access Controls",
         "Manage Users",
         "Backup",
@@ -304,6 +326,8 @@ def dashboard():
         sni_menu()
     elif option == "Performance Settings":
         performance_menu()
+    elif option == "MTProto Settings":
+        mtproto_menu()
     elif option == "Access Controls":
         access_controls_menu()
     elif option == "Manage Users":

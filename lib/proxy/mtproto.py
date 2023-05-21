@@ -23,6 +23,9 @@ def configure_mtproto(
     mtproto_config["mtproto"]["mask_host"] = cert_config["FAKE_SNI"]
     mtproto_config["mtproto"]["sni"] = cert_config["FAKE_SNI"]
     mtproto_config["server"]["port"] = proxy_config["PORT"]
+    if proxy_config["AD_TAG"]:
+        mtproto_config["mtproto"]["ad_tag"] = proxy_config["AD_TAG"]
+        mtproto_config["proxy"]["use_middle_proxy"] = True
 
     save_toml(mtproto_config, mtproto_config_file)
 
@@ -102,3 +105,14 @@ def prompt_extra_port_number(proxy_name: str, protocol: str):
 
         except ValueError:
             print("That's not an integer. Please try again.")
+
+
+def prompt_mtproto_adtag():
+    print(
+        "If you'd like to show your Telegram channel as the sponsor of this proxy, enter the adtag you received from @MTProxybot"
+    )
+    ad_tag = input("\nEnter your Telegram channel adtag or leave it empty to disable: ")
+    if ad_tag:
+        return ad_tag
+
+    return None
