@@ -11,15 +11,14 @@ domain = ""
 [mtproto]
 # Server Name Indication that is inserted in TLS HelloClient packets
 sni = "MTPROTO_FAKE_SNI"
-# Tag for advertising, obtainable from @MTProxybot
-#ad_tag = "3c09c680b76ee91a4c25ad51f742267d"
 # Enable proxying bad clients to some host
 mask = true
 # The next host to forward bad clients
 mask_host = "MTPROTO_FAKE_SNI"
 # The next host's port to forward bad clients
 mask_port = 443
-
+# Tag for advertising, obtainable from @MTProxybot
+#ad_tag = "3c09c680b76ee91a4c25ad51f742267d"
 
 [proxy]
 # Configure the proxy and share urls with the assumption of running behind Caddy

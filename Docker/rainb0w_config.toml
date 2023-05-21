@@ -1,5 +1,5 @@
 # Rainb0w Lite config file
-VERSIONCODE=1.5
+VERSIONCODE=1.8
 
 [CERT]
 # This domain must be an accessible and well-known domain

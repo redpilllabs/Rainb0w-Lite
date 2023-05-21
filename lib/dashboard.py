@@ -7,6 +7,9 @@ from fileinput import FileInput
 from time import sleep
 from typing import List
 
+from pick import pick
+from rich import print
+
 from base.config import (
     BLOCKY_CONFIG_FILE,
     CLIENT_CONFIG_FILES_DIR,
@@ -17,11 +20,9 @@ from base.config import (
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
 )
-from pick import pick
 from proxy.blocky import disable_porn_dns_blocking, enable_porn_dns_blocking
 from proxy.mtproto import change_mtproto_adtag, prompt_mtproto_adtag, reset_mtproto_sni
 from proxy.xray import reset_xray_sni
-from rich import print
 from user.user_manager import (
     add_user_to_proxies,
     create_new_user,
@@ -29,6 +30,7 @@ from user.user_manager import (
     get_users,
     print_client_info,
     remove_user,
+    reset_user_credentials,
     save_users,
 )
 from utils.ac_utils import is_porn_blocked
@@ -176,27 +178,44 @@ def access_controls_menu():
     dashboard()
 
 
-def user_info_menu(user: str):
+def user_info_menu(username: str):
     global NEED_SERVICE_RESTART
 
-    title = f"Select any option for {user}:"
+    title = f"Select any option for {username}:"
     options = [
         "View QR codes and share URLs",
+        "Reset Credentials",
         "Remove User",
         "Back to Users Management Menu",
     ]
     option, _ = pick(options, title)
     if option == "View QR codes and share URLs":
-        print_client_info(user, RAINB0W_USERS_FILE, RAINB0W_CONFIG_FILE)
+        print_client_info(username, RAINB0W_USERS_FILE, RAINB0W_CONFIG_FILE)
         prompt_clear_screen()
+    elif option == "Reset Credentials":
+        title = f"Confirm resetting credentials for '{username}'?"
+        options = ["Yes", "No"]
+        option, _ = pick(options, title)
+        if option == "Yes":
+            rainb0w_users = get_users(RAINB0W_USERS_FILE)
+            if rainb0w_users:
+                for user in rainb0w_users:
+                    if user["name"] == username:
+                        reset_user_credentials(username, RAINB0W_USERS_FILE)
+                        gen_user_links_qrcodes(user, RAINB0W_CONFIG_FILE)
+                        print(
+                            "Credentials reset. You can view the new links and QR codes already but changes only take effect after selecting 'Apply Changes' in the dashboard!"
+                        )
+                        prompt_clear_screen()
+                        NEED_SERVICE_RESTART = True
     elif option == "Remove User":
-        title = f"Confirm removing '{user}'?"
+        title = f"Confirm removing '{username}'?"
         options = ["Yes", "No"]
         option, _ = pick(options, title)
         if option == "Yes":
             NEED_SERVICE_RESTART = True
             remove_user(
-                user,
+                username,
                 RAINB0W_CONFIG_FILE,
                 RAINB0W_USERS_FILE,
                 XRAY_CONFIG_FILE,
@@ -204,7 +223,7 @@ def user_info_menu(user: str):
             )
             clear_screen()
         else:
-            user_info_menu(user)
+            user_info_menu(username)
 
 
 def users_management_menu():

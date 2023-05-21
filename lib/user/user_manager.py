@@ -5,6 +5,8 @@ from os import urandom
 from random import randint
 from uuid import uuid4
 
+from rich import print
+
 from base.config import CLIENT_CONFIG_FILES_DIR, PUBLIC_IP
 from proxy.hysteria import (
     configure_hysteria_client,
@@ -13,7 +15,6 @@ from proxy.hysteria import (
 )
 from proxy.mtproto import configure_mtproto_client
 from proxy.xray import configure_xray_reality_client, xray_add_user, xray_remove_user
-from rich import print
 from utils.helper import (
     bytes_to_raw_str,
     gen_qrcode,
@@ -151,6 +152,21 @@ def remove_user(
                     hysteria_remove_user(user, hysteria_config_file)
                 remove_dir(f"{CLIENT_CONFIG_FILES_DIR}/{user['name']}")
                 rainb0w_users.remove(user)
+                save_users(rainb0w_users, rainb0w_users_file)
+
+
+def reset_user_credentials(username: str, rainb0w_users_file: str):
+    rainb0w_users = get_users(rainb0w_users_file)
+    if rainb0w_users:
+        for user in rainb0w_users:
+            if user["name"] == username:
+                print(f"Resetting the user credentials for '{username}'...")
+                user["password"] = gen_random_string(randint(8, 12))
+                user["uuid"] = str(uuid4())
+                user["short_id"] = "".join(
+                    random.choice("0123456789abcdef") for _ in range(8)
+                )
+                user["secret"] = urandom(16).hex()
                 save_users(rainb0w_users, rainb0w_users_file)
 
 

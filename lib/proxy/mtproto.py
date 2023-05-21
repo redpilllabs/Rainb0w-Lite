@@ -116,3 +116,22 @@ def prompt_mtproto_adtag():
         return ad_tag
 
     return None
+
+
+def change_mtproto_adtag(
+    rainbow_config_file: str, mtproto_config_file: str, adtag=None
+):
+    rainb0w_config = load_toml(rainbow_config_file)
+    mtproto_config = load_toml(mtproto_config_file)
+
+    if adtag:
+        mtproto_config["mtproto"]["ad_tag"] = adtag
+        mtproto_config["proxy"]["use_middle_proxy"] = True
+        rainb0w_config["MTPROTO"]["AD_TAG"] = adtag
+    else:
+        mtproto_config["mtproto"]["ad_tag"] = ""
+        mtproto_config["proxy"]["use_middle_proxy"] = False
+        rainb0w_config["MTPROTO"]["AD_TAG"] = ""
+
+    save_toml(mtproto_config, mtproto_config_file)
+    save_toml(rainb0w_config, rainbow_config_file)

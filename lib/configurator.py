@@ -5,8 +5,6 @@ import random
 import signal
 import sys
 
-from pick import pick
-
 from base.config import (
     HYSTERIA_CONFIG_FILE,
     MTPROTOPY_CONFIG_FILE,
@@ -16,8 +14,14 @@ from base.config import (
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
 )
+from pick import pick
 from proxy.hysteria import configure_hysteria
-from proxy.mtproto import configure_mtproto, prompt_extra_port_number
+from proxy.mtproto import (
+    change_mtproto_adtag,
+    configure_mtproto,
+    prompt_extra_port_number,
+    prompt_mtproto_adtag,
+)
 from proxy.xray import configure_xray_reality
 from user.user_manager import (
     add_user_to_proxies,
