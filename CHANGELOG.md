@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.8
+
+- Enable setting AdTags for MTProto proxies to display sponsoring channels
+- Enable setting an extra port for MTProto
+- Enable resetting user credentials (password, secret, uuids)
+- Fix blocky DNS resolver requirement detection
+
 ## Version 1.7
 
 - Fix Docker network init with newer Docker versions
