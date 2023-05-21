@@ -110,9 +110,12 @@ def configure():
     # Hysteria requires two more steps (ALPN and obfs)
     if "Hysteria" in selected:
         total_steps += 1
-    # MTProto port prompt
-    if "MTProto" in selected and "Xray REALITY" in selected:
+    # MTProto adtag prompt
+    if "MTProto" in selected:
         total_steps += 1
+        # MTProto extra port prompt
+        if "Xray REALITY" in selected:
+            total_steps += 1
 
     if "Xray REALITY" not in selected and "Hysteria" not in selected:
         rainb0w_config["BLOCKY"]["IS_ENABLED"] = False
