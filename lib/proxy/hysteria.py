@@ -41,13 +41,17 @@ def configure_hysteria_client(user_info: dict, proxy_config: dict, cert_config: 
 
     client_config = load_json(HYSTERIA_CLIENT_TEMPLATE_CONFIG_FILE)
 
-    client_config["server"] = f"{PUBLIC_IP}:{proxy_config['PORT']}"
     client_config["server_name"] = cert_config["FAKE_SNI"]
     client_config["auth"] = bytes_to_raw_str(
         base64.b64encode(user_info["password"].encode())
     )
+
     if proxy_config["OBFS"]:
+        client_config["server"] = f"{PUBLIC_IP}:8443"
         client_config["obfs"] = proxy_config["OBFS"]
+    else:
+        client_config["server"] = f"{PUBLIC_IP}:443"
+
     if proxy_config["ALPN"]:
         client_config["alpn"] = proxy_config["ALPN"]
 
@@ -59,9 +63,9 @@ def configure_hysteria_client(user_info: dict, proxy_config: dict, cert_config: 
     auth_base64 = auth_base64.replace("=", "%3D")
 
     if {proxy_config["OBFS"]}:
-        share_url = f"hysteria://{PUBLIC_IP}:{proxy_config['PORT']}/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}+Hysteria"
+        share_url = f"hysteria://{PUBLIC_IP}:8443/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}+Hysteria"
     else:
-        share_url = f"hysteria://{PUBLIC_IP}:{proxy_config['PORT']}/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}#{user_info['name']}+Hysteria"
+        share_url = f"hysteria://{PUBLIC_IP}:443/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={auth_base64}&alpn={proxy_config['ALPN']}#{user_info['name']}+Hysteria"
 
     write_txt_file(
         share_url, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"

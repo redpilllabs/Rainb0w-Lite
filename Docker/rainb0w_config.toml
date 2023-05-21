@@ -8,16 +8,17 @@ FAKE_SNI = ""
 
 [XRAY]
 IS_ENABLED = false
-PORT = 443
+PORT = 443  # Also available on 8443
 PRIVATE_KEY = ""
 PUBLIC_KEY = ""
 
 [HYSTERIA]
 IS_ENABLED = false
-PORT = 8443
+PORT = 8443 # 443 when obfs is blank
 ALPN = ""
 OBFS = ""
 
 [MTPROTO]
 IS_ENABLED = false
 PORT = 993
+EXTRA_PORT = 0

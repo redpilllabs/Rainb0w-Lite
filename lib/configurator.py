@@ -17,7 +17,7 @@ from base.config import (
     XRAY_CONFIG_FILE,
 )
 from proxy.hysteria import configure_hysteria
-from proxy.mtproto import configure_mtproto
+from proxy.mtproto import configure_mtproto, prompt_extra_port_number
 from proxy.xray import configure_xray_reality
 from user.user_manager import (
     add_user_to_proxies,
@@ -106,8 +106,12 @@ def configure():
     # We need 2 steps regardless of proxy choice,
     #  one for the fake sni and one for username prompt
     total_steps = 2
+
     # Hysteria requires two more steps (ALPN and obfs)
     if "Hysteria" in selected:
+        total_steps += 1
+    # MTProto port prompt
+    if "MTProto" in selected and "Xray REALITY" in selected:
         total_steps += 1
 
     curr_step = 1
@@ -123,8 +127,17 @@ def configure():
 
     if "MTProto" in selected:
         rainb0w_config["MTPROTO"]["IS_ENABLED"] = True
+        if "Xray REALITY" in selected:
+            progress_indicator(curr_step, total_steps, "MTProto Extra Port")
+            rainb0w_config["MTPROTO"]["EXTRA_PORT"] = prompt_extra_port_number(
+                "MTProto", "TCP"
+            )
+            curr_step += 1
+        else:
+            rainb0w_config["MTPROTO"]["EXTRA_PORT"] = 443
+
     else:
-        remove_dir(f"{RAINB0W_HOME_DIR}/mtprotopy")
+        remove_dir(f"{RAINB0W_HOME_DIR}/mtproto")
 
     if "Hysteria" in selected:
         progress_indicator(curr_step, total_steps, "Hysteria Mode")
@@ -133,12 +146,12 @@ def configure():
 
         option, _ = pick(options, title)
         if option == "Raw Obfuscated UDP [Recommended]":
-            rainb0w_config["HYSTERIA"]["PORT"] = 8443
+            # Port will be set to 8443
             rainb0w_config["HYSTERIA"]["OBFS"] = gen_random_string(
                 random.randint(8, 12)
             )
         elif option == "Normal QUIC":
-            rainb0w_config["HYSTERIA"]["PORT"] = 443
+            # Port will be set to 443/udp
             rainb0w_config["HYSTERIA"]["ALPN"] = "h3"
 
         rainb0w_config["HYSTERIA"]["IS_ENABLED"] = True

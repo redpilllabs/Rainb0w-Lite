@@ -25,17 +25,21 @@ if printf '%s\n' "${CONTAINERS[@]}" | grep -q -E "xray|hysteria"; then
 fi
 
 if [[ " ${CONTAINERS[@]} " =~ "xray" ]]; then
-    REALITY_ENABLED=true
+    source $PWD/lib/shell/access_control/allow_port_xray.sh
     fn_restart_docker_container "xray"
+    REALITY_ENABLED=true
 fi
 
 if [[ " ${CONTAINERS[@]} " =~ "mtproto" ]]; then
-    MTPROTO_ENABLED=true
+    mtproto_extra_port=$(python3 $PWD/lib/shell/helper/get_mtproto_extra_port.py)
+    bash $PWD/lib/shell/access_control/allow_port_mtproto.sh $mtproto_extra_port
     fn_restart_docker_container "mtproto"
+    MTPROTO_ENABLED=true
 fi
 
 if [[ " ${CONTAINERS[@]} " =~ "hysteria" ]]; then
-    HYSTERIA_ENABLED=true
+    hysteria_mode=$(python3 $PWD/lib/shell/helper/get_hysteria_mode.py)
+    source $PWD/lib/shell/access_control/allow_port_hysteria.sh "$hysteria_mode"
 
     # Generate a self-signed x509 certificate for Hysteria
     output=$(python3 $PWD/lib/shell/helper/get_cert_info.py)
@@ -54,6 +58,7 @@ if [[ " ${CONTAINERS[@]} " =~ "hysteria" ]]; then
         ) | crontab -
     fi
     fn_restart_docker_container "hysteria"
+    HYSTERIA_ENABLED=true
 fi
 
 echo -e "\n\nYour proxies are ready now!\n"

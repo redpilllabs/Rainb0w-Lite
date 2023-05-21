@@ -35,12 +35,13 @@ def configure_mtproto_client(
 ):
     from base.config import PUBLIC_IP
 
+    if proxy_config["EXTRA_PORT"] > 0:
+        port = proxy_config["EXTRA_PORT"]
+    else:
+        port = proxy_config["PORT"]
+
     https_prefix = (
-        "https://t.me/"
-        + "proxy?server="
-        + PUBLIC_IP
-        + f"&port={proxy_config['PORT']}"
-        + "&secret="
+        "https://t.me/" + "proxy?server=" + PUBLIC_IP + f"&port={port}" + "&secret="
     )
     tls_bytes = (
         bytes.fromhex("ee" + user_info["secret"]) + cert_config["FAKE_SNI"].encode()
@@ -70,3 +71,34 @@ def reset_mtproto_sni(
     mtproto_config["mtproto"]["sni"] = sni
 
     save_toml(mtproto_config, mtproto_config_file)
+
+
+def prompt_extra_port_number(proxy_name: str, protocol: str):
+    print("Enter 0 to skip this if you only intend to use the default port 993.")
+    while True:
+        try:
+            user_input = int(
+                input(
+                    f"\nEnter an available {protocol} extra port number for {proxy_name}: "
+                )
+            )
+
+            port = int(user_input)
+            if 1 <= port <= 65535:
+                if port == 443:
+                    print(
+                        "This port is already selected for Xray, please choose another one."
+                    )
+                elif port == 993:
+                    print(
+                        "This port is already the default one for MTProto, please choose another one."
+                    )
+                else:
+                    return port
+            if port == 0:
+                return 0
+            else:
+                print("Input not valid. Please try again.")
+
+        except ValueError:
+            print("That's not an integer. Please try again.")
