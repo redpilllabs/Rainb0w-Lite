@@ -85,7 +85,7 @@ def prompt_extra_port_number(proxy_name: str, protocol: str):
 
             port = int(user_input)
             if 1 <= port <= 65535:
-                if port == 443:
+                if port in [443, 8443]:
                     print(
                         "This port is already selected for Xray, please choose another one."
                     )
