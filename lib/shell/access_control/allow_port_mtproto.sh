@@ -1,6 +1,5 @@
 #!/bin/bash
 source $PWD/lib/shell/base/colors.sh
-source $PWD/lib/shell/base/config.sh
 source $PWD/lib/shell/os/os_utils.sh
 
 ### Args

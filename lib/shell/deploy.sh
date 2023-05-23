@@ -72,23 +72,29 @@ if [ ! $# -eq 0 ]; then
     if [ "$1" == 'Install' ]; then
         username=$(python3 $PWD/lib/shell/helper/get_username.py)
         echo $(printf '=%.0s' {1..60})
-        if [ "$REALITY_ENABLED" = true ]; then
-            echo -e "\n*********************** Xray REALITY ***********************"
-            cat ${CLIENT_CONFIG_FILES_DIR}/${username}/reality-url.txt
-            echo -e "\n\n"
-            qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/reality-url.txt"
+        if [ -v REALITY_ENABLED ]; then
+            if [ "$REALITY_ENABLED" = true ]; then
+                echo -e "\n*********************** Xray REALITY ***********************"
+                cat ${CLIENT_CONFIG_FILES_DIR}/${username}/reality-url.txt
+                echo -e "\n\n"
+                qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/reality-url.txt"
+            fi
         fi
-        if [ "$MTPROTO_ENABLED" = true ]; then
-            echo -e "\n*********************** MTProto ***********************"
-            cat ${CLIENT_CONFIG_FILES_DIR}/${username}/mtproto-url.txt
-            echo -e "\n\n"
-            qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/mtproto-url.txt"
+        if [ -v MTPROTO_ENABLED ]; then
+            if [ "$MTPROTO_ENABLED" = true ]; then
+                echo -e "\n*********************** MTProto ***********************"
+                cat ${CLIENT_CONFIG_FILES_DIR}/${username}/mtproto-url.txt
+                echo -e "\n\n"
+                qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/mtproto-url.txt"
+            fi
         fi
-        if [ "$HYSTERIA_ENABLED" = true ]; then
-            echo -e "\n*********************** Hysteria ***********************"
-            cat ${CLIENT_CONFIG_FILES_DIR}/${username}/hysteria-url.txt
-            echo -e "\n\n"
-            qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/hysteria-url.txt"
+        if [ -v HYSTERIA_ENABLED ]; then
+            if [ "$HYSTERIA_ENABLED" = true ]; then
+                echo -e "\n*********************** Hysteria ***********************"
+                cat ${CLIENT_CONFIG_FILES_DIR}/${username}/hysteria-url.txt
+                echo -e "\n\n"
+                qrencode -t ansiutf8 <"${CLIENT_CONFIG_FILES_DIR}/${username}/hysteria-url.txt"
+            fi
         fi
         echo -e "\n"
         echo $(printf '=%.0s' {1..60})
