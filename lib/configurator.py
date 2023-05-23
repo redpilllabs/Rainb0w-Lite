@@ -180,14 +180,14 @@ def configure():
     progress_indicator(curr_step, total_steps, "User Management")
     username = prompt_username()
 
+    # Save the configuration to file because we're going to pass it around next
+    save_toml(rainb0w_config, RAINB0W_CONFIG_FILE)
+
     # Generate a user object with the given name and save it to users file
     user_info = create_new_user(username)
     rainb0w_users = get_users(RAINB0W_USERS_FILE)
     rainb0w_users.append(user_info)
     save_users(rainb0w_users, RAINB0W_USERS_FILE)
-
-    # Save the configuration to file because we're going to pass it around next
-    save_toml(rainb0w_config, RAINB0W_CONFIG_FILE)
 
     apply_config()
 
@@ -214,5 +214,4 @@ def signal_handler(sig, frame):
 if __name__ == "__main__":
     # Enable bailing out!
     signal.signal(signal.SIGINT, signal_handler)
-    main()
     main()
