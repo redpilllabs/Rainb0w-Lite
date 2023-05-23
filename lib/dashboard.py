@@ -7,9 +7,6 @@ from fileinput import FileInput
 from time import sleep
 from typing import List
 
-from pick import pick
-from rich import print
-
 from base.config import (
     BLOCKY_CONFIG_FILE,
     CLIENT_CONFIG_FILES_DIR,
@@ -20,9 +17,11 @@ from base.config import (
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
 )
+from pick import pick
 from proxy.blocky import disable_porn_dns_blocking, enable_porn_dns_blocking
 from proxy.mtproto import change_mtproto_adtag, prompt_mtproto_adtag, reset_mtproto_sni
 from proxy.xray import reset_xray_sni
+from rich import print
 from user.user_manager import (
     add_user_to_proxies,
     create_new_user,
@@ -332,7 +331,7 @@ def dashboard():
     options = [
         "SNI Settings",
         "Performance Settings",
-        "MTProto Settings",
+        # "MTProto Settings",
         "Access Controls",
         "Manage Users",
         "Backup",
