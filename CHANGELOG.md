@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.9
+
+- Fix Xray REALITY client urls and QR code not showing when deployed alongside Hysteria
+- Fix DNS resolver issue after uninstallation
+- Temporarily disable MTProto deployment considering recent connection issues
+
 ## Version 1.8
 
 - Enable setting AdTags for MTProto proxies to display sponsoring channels
