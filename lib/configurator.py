@@ -102,7 +102,7 @@ def configure():
     rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
 
     title = "Select the proxies you'd like to deploy [Press 'Space' to mark]:"
-    options = ["Xray REALITY", "MTProto", "Hysteria"]
+    options = ["Xray REALITY", "Hysteria"]
 
     selected = pick(options, title, multiselect=True, min_selection_count=1)
     selected = [item[0] for item in selected]  # type: ignore
@@ -214,4 +214,5 @@ def signal_handler(sig, frame):
 if __name__ == "__main__":
     # Enable bailing out!
     signal.signal(signal.SIGINT, signal_handler)
+    main()
     main()
