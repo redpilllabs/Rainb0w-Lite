@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.9.1
+
+- Fix MTProto connectivity and bring it back on port 8443
+- Allow setting .ir domains and domains on Iranian IP for REALITY
+- Fix Hysteria sharing links compatibilty issues with some clients
+- Fix ip6tables cleanup after uninstallation
+
 ## Version 1.9
 
 - Fix Xray REALITY client urls and QR code not showing when deployed alongside Hysteria
