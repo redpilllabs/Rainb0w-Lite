@@ -50,19 +50,6 @@ cd Rainb0w-Lite
 
 برای راهنمای تصویری نصب به قسمت [ویکی](https://github.com/redpilllabs/Rainb0w-Lite/wiki) پروژه مراجعه نمایید.
 
-# نکته مهم برای هیستریا
-
-متاسفانه لینک های اشتراک هیستریا شامل تمام پارامتر های مورد نیاز برای استفاده نیستند و پس از اضافه کردن کانفیگ از طریق لینک یا کیو آر کد باید به تنظیمات کانفیگ رفته و مقادیر زیر رو بطور دستی اعمال کنید:
-
-```
-Authentication Type:  BASE64
-Disable MTU Path Discovery: Enabled
-Upload Speed:   YOUR REAL UPLOAD SPEED
-Download Speed: YOUR REAL DOWNLOAD SPEED
-QUIC Stream Receive Window: 1677768
-QUIC Connection Receive Window: 4194304
-```
-
 ## راه های ارتباطی
 
 - طرح سوال ها در قسمت Discussion همین مخزن
