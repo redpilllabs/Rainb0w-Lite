@@ -57,9 +57,9 @@ def configure_hysteria_client(user_info: dict, proxy_config: dict, cert_config: 
     )
 
     if {proxy_config["OBFS"]}:
-        share_url = f"hysteria://{PUBLIC_IP}:8443/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}+Hysteria"
+        share_url = f"hysteria://{PUBLIC_IP}:8443/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}%20Hysteria"
     else:
-        share_url = f"hysteria://{PUBLIC_IP}:443/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}#{user_info['name']}+Hysteria"
+        share_url = f"hysteria://{PUBLIC_IP}:443/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}#{user_info['name']}%20Hysteria"
 
     write_txt_file(
         share_url, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"
