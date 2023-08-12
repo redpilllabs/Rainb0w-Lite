@@ -16,11 +16,17 @@ ip6tables -P FORWARD ACCEPT
 iptables -P OUTPUT ACCEPT
 ip6tables -P OUTPUT ACCEPT
 iptables -F
+ip6tables -F
 iptables -X
+ip6tables -X
 iptables -t nat -F
+ip6tables -t nat -F
 iptables -t nat -X
+ip6tables -t nat -X
 iptables -t mangle -F
+ip6tables -t mangle -F
 iptables -t mangle -X
+ip6tables -t mangle -X
 systemctl restart docker
 
 # Save changes
