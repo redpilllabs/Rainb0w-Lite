@@ -3,7 +3,9 @@
 
 import os
 import re
+import signal
 from fileinput import FileInput
+import sys
 from time import sleep
 from typing import List
 
@@ -93,6 +95,27 @@ def sni_menu():
         if rainb0w_users:
             for user in rainb0w_users:
                 gen_user_links_qrcodes(user, RAINB0W_CONFIG_FILE)
+
+        print("Applying firewall settings")
+        #FIXME: Somehow the last remaining rule is not removed so we need to run this twice!
+        run_system_cmd(
+                [
+                    f"{os.getcwd()}/lib/shell/access_control/remove_sni_subnet.sh"
+                ]
+            )
+        run_system_cmd(
+                [
+                    f"{os.getcwd()}/lib/shell/access_control/remove_sni_subnet.sh"
+                ]
+            )
+        run_system_cmd(
+                [
+                    f"{os.getcwd()}/lib/shell/access_control/allow_sni_subnet.sh",
+                    rainb0w_config["CERT"]["FAKE_SNI"],
+                ]
+            )
+
+
         NEED_SERVICE_RESTART = True
         print(
             "Changes only take effect after selecting 'Apply Changes' in the dashboard!"
@@ -365,6 +388,11 @@ def dashboard():
         print("Exiting!")
         exit(0)
 
+def signal_handler(sig, frame):
+    print("\nOkay! Exiting!")
+    sys.exit(1)
 
 if __name__ == "__main__":
+    # Enable bailing out!
+    signal.signal(signal.SIGINT, signal_handler)
     dashboard()

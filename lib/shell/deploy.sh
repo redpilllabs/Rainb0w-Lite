@@ -10,9 +10,12 @@ source $PWD/lib/shell/docker/init_vol_net.sh
 
 # Apply Kernel's network stack optimizations
 source $PWD/lib/shell/performance/tune_kernel_net.sh
-
 # Setup firewall with necessary protections
 source $PWD/lib/shell/access_control/setup_firewall.sh
+
+# Allow outbound connections to the network hosting the selected SNI
+FAKE_SNI=$(python3 $PWD/lib/shell/helper/get_cert_info.py)
+source $PWD/lib/shell/access_control/allow_sni_subnet.sh $FAKE_SNI
 
 # Check if user selected proxies that need DNS support
 python3 $PWD/lib/shell/helper/get_proxy_status.py "blocky"

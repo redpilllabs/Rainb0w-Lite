@@ -23,10 +23,6 @@ def extract_domain(domain: str) -> str:
         return domain
 
 
-def is_ir_domain(input: str) -> bool:
-    return bool(re.search(r"\.ir$", input))
-
-
 def prompt_fake_sni() -> str:
     print(
         """
@@ -34,11 +30,6 @@ Enter a random (but legitimate) domain as the fake SNI for your proxies.
 This should be a wellknown domain and accessible on your network without a proxy.
 You're actually disguising your traffic as destined for this website, and
 it will be applied to all of your proxies.
-
-TIP: Good examples include domains hosted on your network subnet. You should research and find them based on your assigned IP.
-
-NOTE: This cannot be a domain on Iranian IP or a [.ir] domain, since outgoing
-connections to Iranian IPs are blocked with this script!
     """
     )
     fake_sni = input("\nEnter a fake SNI: ")
@@ -46,11 +37,6 @@ connections to Iranian IPs are blocked with this script!
         if not (is_domain(fake_sni) or is_subdomain(fake_sni)):
             print(
                 "\nInvalid domain name! Please enter in any of these formats [example.com, sub.example.com]"
-            )
-            fake_sni = input("Enter a fake SNI: ")
-        elif is_ir_domain(fake_sni):
-            print(
-                "\nDomain names with the [.ir] TLD are not accepted since outgoing connections to Iranian IPs are blocked with this script! Please enter another domain name."
             )
             fake_sni = input("Enter a fake SNI: ")
         else:

@@ -6,7 +6,7 @@ def run_system_cmd(cmd: List[str]):
     # Start the subprocess
     process = subprocess.Popen(
         cmd,
-        shell=True,
+        shell=False,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )

@@ -97,10 +97,10 @@ iptables -I FORWARD -i $INTERFACE -m geoip ! --src-cc IR -m conntrack --ctstate 
 ip6tables -I FORWARD -i $INTERFACE -m geoip ! --src-cc IR -m conntrack --ctstate NEW -m comment --comment "Drop everything except Iran" -j DROP
 
 echo -e "${B_GREEN}>> Drop OUTGOING connections to Iran and China ${RESET}"
-iptables -I FORWARD -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -j REJECT
-ip6tables -I FORWARD -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -j REJECT
-iptables -A OUTPUT -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -j REJECT
-ip6tables -A OUTPUT -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -j REJECT
+iptables -I FORWARD -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -m comment --comment "Drop OUTGOING to IR and CN" -j REJECT
+ip6tables -I FORWARD -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -m comment --comment "Drop OUTGOING to IR and CN" -j REJECT
+iptables -A OUTPUT -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -m comment --comment "Drop OUTGOING to IR and CN" -j REJECT
+ip6tables -A OUTPUT -m geoip --dst-cc IR,CN -m conntrack --ctstate NEW -m comment --comment "Drop OUTGOING to IR and CN" -j REJECT
 
 echo -e "${B_GREEN}>> Drop invalid packets ${RESET}"
 iptables -A INPUT -m conntrack --ctstate INVALID -m comment --comment "Drop Invalid Packets" -j DROP
