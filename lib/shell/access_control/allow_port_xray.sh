@@ -6,11 +6,12 @@ source $PWD/lib/shell/os/os_utils.sh
 INTERFACE=$(ip route get '8.8.8.8' | awk '{print $5}')
 
 # Grab the line number of the rule that has the comment 'Drop Invalid Packets'
-LINENUM=$(iptables -L INPUT --line-numbers | grep 'Drop Invalid Packets' | awk '{print $1}')
+LINENUM_IPV4=$(iptables -L INPUT --line-numbers | grep 'Drop Invalid Packets' | awk '{print $1}')
+LINENUM_IPV6=$(ip6tables -L INPUT --line-numbers | grep 'Drop Invalid Packets' | awk '{print $1}')
 
 echo -e "${B_GREEN}>> Allow port 443/tcp and 8443/tcp for REALITY ${RESET}"
-iptables -I INPUT $LINENUM -p tcp --dport 443 -m conntrack --ctstate NEW -m comment --comment "Allow REALITY" -j ACCEPT
-ip6tables -I INPUT $LINENUM -p tcp --dport 443 -m conntrack --ctstate NEW -m comment --comment "Allow REALITY" -j ACCEPT
+iptables -I INPUT $LINENUM_IPV4 -p tcp --dport 443 -m conntrack --ctstate NEW -m comment --comment "Allow REALITY" -j ACCEPT
+ip6tables -I INPUT $LINENUM_IPV6 -p tcp --dport 443 -m conntrack --ctstate NEW -m comment --comment "Allow REALITY" -j ACCEPT
 iptables -t nat -A PREROUTING -i $INTERFACE -p tcp --dport 8443 -j DNAT --to-destination :443
 ip6tables -t nat -A PREROUTING -i $INTERFACE -p tcp --dport 8443 -j DNAT --to-destination :443
 
