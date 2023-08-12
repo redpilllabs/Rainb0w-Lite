@@ -90,7 +90,7 @@ def configure_xray_reality_client(
         "shortId"
     ] = user_info["short_id"]
 
-    share_url = f"vless://{user_info['uuid']}@{PUBLIC_IP}:{proxy_config['PORT']}?security=reality&encryption=none&pbk={proxy_config['PUBLIC_KEY']}&headerType=none&fp=chrome&spx=%2F&type=tcp&flow=xtls-rprx-vision&sni={cert_config['FAKE_SNI']}&sid={user_info['short_id']}#{user_info['name']}+REALITY"
+    share_url = f"vless://{user_info['uuid']}@{PUBLIC_IP}:{proxy_config['PORT']}?security=reality&encryption=none&pbk={proxy_config['PUBLIC_KEY']}&headerType=none&fp=chrome&spx=%2F&type=tcp&flow=xtls-rprx-vision&sni={cert_config['FAKE_SNI']}&sid={user_info['short_id']}#{user_info['name']}%20REALITY"
     write_txt_file(
         share_url, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-url.txt"
     )
