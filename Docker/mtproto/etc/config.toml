@@ -2,7 +2,7 @@ title = "MTProtoPy Configuration"
 
 [server]
 # Listening port for incoming connections
-port = 993
+port = 8443
 # If you have a domain name you can insert below so that share urls (tg://..) include a domain name
 # otherwise leave blank and your server's public IP will be inserted
 domain = ""
@@ -37,7 +37,10 @@ prefer_ipv6 = true
 use_middle_proxy = false
 # Disables tg->client traffic re-encryption, faster but less secure
 fast_mode = false
-
+# Print connection stats
+print_user_stats = false
+# How often to print connection stats
+stats_print_period = 10
 
 [metrics]
 enabled = false

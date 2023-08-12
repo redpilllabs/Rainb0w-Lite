@@ -102,7 +102,7 @@ def configure():
     rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
 
     title = "Select the proxies you'd like to deploy [Press 'Space' to mark]:"
-    options = ["Xray REALITY", "Hysteria"]
+    options = ["Xray REALITY", "Hysteria", "MTProto"]
 
     selected = pick(options, title, multiselect=True, min_selection_count=1)
     selected = [item[0] for item in selected]  # type: ignore
@@ -167,10 +167,8 @@ def configure():
             rainb0w_config["HYSTERIA"]["OBFS"] = gen_random_string(
                 random.randint(8, 12)
             )
-        elif option == "Normal QUIC":
-            # Port will be set to 443/udp
-            rainb0w_config["HYSTERIA"]["ALPN"] = "h3"
 
+        rainb0w_config["HYSTERIA"]["ALPN"] = "h3"
         rainb0w_config["HYSTERIA"]["IS_ENABLED"] = True
         curr_step += 1
     else:

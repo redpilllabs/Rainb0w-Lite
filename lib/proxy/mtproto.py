@@ -77,7 +77,7 @@ def reset_mtproto_sni(
 
 
 def prompt_extra_port_number(proxy_name: str, protocol: str):
-    print("Enter 0 to skip this if you only intend to use the default port 993.")
+    print("Enter 0 to skip this if you only intend to use the default port 8443.")
     while True:
         try:
             user_input = int(
@@ -88,11 +88,11 @@ def prompt_extra_port_number(proxy_name: str, protocol: str):
 
             port = int(user_input)
             if 1 <= port <= 65535:
-                if port in [443, 8443]:
+                if port == 443:
                     print(
                         "This port is already selected for Xray, please choose another one."
                     )
-                elif port == 993:
+                elif port == 8443:
                     print(
                         "This port is already the default one for MTProto, please choose another one."
                     )

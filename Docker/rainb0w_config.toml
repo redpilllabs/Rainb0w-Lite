@@ -1,5 +1,5 @@
 # Rainb0w Lite config file
-VERSIONCODE=1.8
+VERSIONCODE = 1.8
 
 [CERT]
 # This domain must be an accessible and well-known domain
@@ -8,19 +8,19 @@ FAKE_SNI = ""
 
 [XRAY]
 IS_ENABLED = false
-PORT = 443  # Also available on 8443
+PORT = 443
 PRIVATE_KEY = ""
 PUBLIC_KEY = ""
 
 [HYSTERIA]
 IS_ENABLED = false
-PORT = 8443 # 443 when obfs is blank
+PORT = 8443        # UDP. Will use 443 when obfs is blank
 ALPN = ""
 OBFS = ""
 
 [MTPROTO]
 IS_ENABLED = false
-PORT = 993
+PORT = 8443        # TCP
 EXTRA_PORT = 0
 AD_TAG = ""
 

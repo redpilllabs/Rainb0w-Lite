@@ -7,7 +7,7 @@ services:
     networks:
       - proxy
     ports:
-      - "993:933"
+      - "8443:8443"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./etc/config.toml:/config/config.toml:ro
