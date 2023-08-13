@@ -8,30 +8,42 @@ FAKE_SNI_IPV4=($(dig @1.1.1.1 +short $1))
 
 for ip in "${FAKE_SNI_IPV4[@]}"; do
     FAKE_SNI_CIDR="${ip%.*}.0/24"
-    echo -e "${B_GREEN}>> Allow SNI IPv4 Subnet $FAKE_SNI_CIDR ${RESET}"
-    # Add it above the georestriction rules to make it an exception
-    LINENUM_IPV4=$(iptables -L FORWARD --line-numbers | grep 'Drop OUTGOING to IR and CN' | awk '{print $1}')
-    iptables -I FORWARD $LINENUM_IPV4 -d "${FAKE_SNI_CIDR}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
-    LINENUM_IPV4=$(iptables -L OUTPUT --line-numbers | grep 'Drop OUTGOING to IR and CN' | awk '{print $1}')
-    iptables -I OUTPUT $LINENUM_IPV4 -d "${FAKE_SNI_CIDR}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+    if ! iptables -L FORWARD | grep "$FAKE_SNI_CIDR"; then
+        echo -e "${B_GREEN}>> Allow SNI IPv4 Subnet $FAKE_SNI_CIDR in FORWARD ${RESET}"
+        # Add it above the georestriction rules to make it an exception
+        LINENUM_IPV4=$(iptables -L FORWARD --line-numbers | grep 'Drop OUTGOING to IR and CN' | awk '{print $1}')
+        iptables -I FORWARD $LINENUM_IPV4 -d "${FAKE_SNI_CIDR}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+    fi
+
+    if ! iptables -L OUTPUT | grep "$FAKE_SNI_CIDR"; then
+        echo -e "${B_GREEN}>> Allow SNI IPv4 Subnet $FAKE_SNI_CIDR in OUTPUT ${RESET}"
+        # Add it above the georestriction rules to make it an exception
+        LINENUM_IPV4=$(iptables -L OUTPUT --line-numbers | grep 'Drop OUTGOING to IR and CN' | awk '{print $1}')
+        iptables -I OUTPUT $LINENUM_IPV4 -d "${FAKE_SNI_CIDR}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+    fi
 done
 
 FAKE_SNI_IPV6=($(dig @1.1.1.1 +short AAAA $1))
 
 for ip in "${FAKE_SNI_IPV6[@]}"; do
     echo -e "${B_GREEN}>> Allow SNI IPv6 $ip ${RESET}"
-    # Add it above the georestriction rules to make it an exception
-    LINENUM_IPV6=$(ip6tables -L FORWARD --line-numbers | grep 'Drop OUTGOING to IR and CN' | awk '{print $1}')
-    if [ -n "$LINENUM_IPV6" ]; then
-        ip6tables -I FORWARD $LINENUM_IPV6 -d "${ip}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
-    else
-        ip6tables -I FORWARD -d "${ip}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+    if ! ip6tables -L FORWARD | grep "$ip"; then
+        # Add it above the georestriction rules to make it an exception
+        LINENUM_IPV6=$(ip6tables -L FORWARD --line-numbers | grep 'Drop OUTGOING to IR and CN' | awk '{print $1}')
+        if [ -n "$LINENUM_IPV6" ]; then
+            ip6tables -I FORWARD $LINENUM_IPV6 -d "${ip}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+        else
+            ip6tables -I FORWARD -d "${ip}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+        fi
     fi
-    LINENUM_IPV6=$(ip6tables -L OUTPUT --line-numbers | grep 'Drop OUTGOING to IR and CN' | awk '{print $1}')
-    if [ -n "$LINENUM_IPV6" ]; then
-        ip6tables -I OUTPUT $LINENUM_IPV6 -d "${ip}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
-    else
-        ip6tables -I OUTPUT -d "${ip}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+
+    if ! ip6tables -L OUTPUT | grep "$ip"; then
+        LINENUM_IPV6=$(ip6tables -L OUTPUT --line-numbers | grep 'Drop OUTGOING to IR and CN' | awk '{print $1}')
+        if [ -n "$LINENUM_IPV6" ]; then
+            ip6tables -I OUTPUT $LINENUM_IPV6 -d "${ip}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+        else
+            ip6tables -I OUTPUT -d "${ip}" -m conntrack --ctstate NEW,ESTABLISHED -m comment --comment "Allow SNI Subnet" -j ACCEPT
+        fi
     fi
 done
 

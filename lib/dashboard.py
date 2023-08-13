@@ -92,12 +92,6 @@ def sni_menu():
                 gen_user_links_qrcodes(user, RAINB0W_CONFIG_FILE)
 
         print("Applying firewall settings")
-        #FIXME: Somehow the last remaining rule is not removed so we need to run this twice!
-        run_system_cmd(
-                [
-                    f"{os.getcwd()}/lib/shell/access_control/remove_sni_subnet.sh"
-                ]
-            )
         run_system_cmd(
                 [
                     f"{os.getcwd()}/lib/shell/access_control/remove_sni_subnet.sh"

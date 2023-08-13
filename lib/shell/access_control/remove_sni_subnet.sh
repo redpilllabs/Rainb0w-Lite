@@ -7,16 +7,24 @@ echo -e "${B_GREEN}>> Removing previously set SNI subnets${RESET}"
 tables=("FORWARD" "OUTPUT")
 
 for table in "${tables[@]}"; do
-    rule_numbers=$(iptables -L $table -n --line-numbers | grep -i "Allow SNI Subnet" | awk '{print $1}')
-    for rule_number in $rule_numbers; do
-        iptables -D "${table}" $rule_number
+    while true; do
+        rule_number=$(iptables -L $table -n --line-numbers | grep -i "Allow SNI Subnet" | awk '{print $1}' | head -n 1)
+        if [ -n "$rule_number" ]; then
+            iptables -D "${table}" $rule_number
+        else
+            break
+        fi
     done
 done
 
 for table in "${tables[@]}"; do
-    rule_numbers=$(ip6tables -L $table -n --line-numbers | grep -i "Allow SNI Subnet" | awk '{print $1}')
-    for rule_number in $rule_numbers; do
-        ip6tables -D "${table}" $rule_number
+    while true; do
+        rule_number=$(ip6tables -L $table -n --line-numbers | grep -i "Allow SNI Subnet" | awk '{print $1}' | head -n 1)
+        if [ -n "$rule_number" ]; then
+            ip6tables -D "${table}" $rule_number
+        else
+            break
+        fi
     done
 done
 
