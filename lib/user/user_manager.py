@@ -1,4 +1,3 @@
-import base64
 import os
 import random
 from os import urandom
@@ -16,7 +15,6 @@ from proxy.hysteria import (
 from proxy.mtproto import configure_mtproto_client
 from proxy.xray import configure_xray_reality_client, xray_add_user, xray_remove_user
 from utils.helper import (
-    bytes_to_raw_str,
     gen_qrcode,
     gen_random_string,
     load_toml,
@@ -218,8 +216,8 @@ Protocol:           UDP
 SNI:                {rainb0w_config['HYSTERIA']['SNI']}
 ALPN:               {rainb0w_config['HYSTERIA']['ALPN']}
 Obfuscation:        {rainb0w_config['HYSTERIA']['OBFS']}
-Auth. Type:         BASE64
-Payload:            {bytes_to_raw_str(base64.b64encode(user["password"].encode()))}
+Auth. Type:         STRING
+Payload:            {user["password"]}
 Allow Insecure:     Enabled
 Max Upload:         YOUR REAL UPLOAD SPEED
 Max Download:       YOUR REAL DOWNLOAD SPEED
