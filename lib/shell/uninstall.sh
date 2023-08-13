@@ -33,10 +33,7 @@ systemctl restart docker
 iptables-save | tee /etc/iptables/rules.v4 >/dev/null
 ip6tables-save | tee /etc/iptables/rules.v6 >/dev/null
 
-echo -e "${B_GREEN}>> Resetting DNS settings${RESET}"
-rm /etc/systemd/resolved.conf.d/nostublistener.conf
-rm /etc/resolv.conf
-ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
-systemctl reload-or-restart systemd-resolved
+# Revert DNS settings
+source $PWD/lib/shell/dns/reset_dns_resolver.sh
 
 echo -e "${B_GREEN}<< Finished uninstallation! >>${RESET}"

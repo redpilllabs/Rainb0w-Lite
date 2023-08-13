@@ -22,7 +22,7 @@ python3 $PWD/lib/shell/helper/get_proxy_status.py "blocky"
 PYTHON_EXIT_CODE=$?
 if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     # Disable DNS stub listener to free up the port 53 for blocky DNS
-    source $PWD/lib/shell/os/disable_dns_stub_listener.sh
+    source $PWD/lib/shell/dns/update_dns_resolver.sh
     fn_restart_docker_container "blocky"
 fi
 
