@@ -1,6 +1,5 @@
 import re
 
-from utils.helper import load_toml
 
 
 def is_domain(domain: str) -> bool:
@@ -23,28 +22,22 @@ def extract_domain(domain: str) -> str:
         return domain
 
 
-def prompt_fake_sni() -> str:
+def prompt_sni(proxy_name="") -> str:
     print(
-        """
-Enter a random (but legitimate) domain as the fake SNI for your proxies.
+        f"""
+Enter a random (but legitimate) domain as the SNI for your {proxy_name} traffic.
 This should be a wellknown domain and accessible on your network without a proxy.
-You're actually disguising your traffic as destined for this website, and
-it will be applied to all of your proxies.
+You're actually disguising your traffic as destined for this website.
     """
     )
-    fake_sni = input("\nEnter a fake SNI: ")
+    proxy_sni = input("\nEnter a SNI: ")
     while True:
-        if not (is_domain(fake_sni) or is_subdomain(fake_sni)):
+        if not (is_domain(proxy_sni) or is_subdomain(proxy_sni)):
             print(
                 "\nInvalid domain name! Please enter in any of these formats [example.com, sub.example.com]"
             )
-            fake_sni = input("Enter a fake SNI: ")
+            proxy_sni = input("Enter a SNI: ")
         else:
             break
 
-    return fake_sni
-
-
-def get_current_sni(rainb0w_config_file: str):
-    rainb0w_config = load_toml(rainb0w_config_file)
-    return rainb0w_config["CERT"]["FAKE_SNI"]
+    return proxy_sni

@@ -35,12 +35,12 @@ def hysteria_remove_user(user_info: dict, hysteria_config_file: str):
     save_json(hysteria_config, hysteria_config_file)
 
 
-def configure_hysteria_client(user_info: dict, proxy_config: dict, cert_config: dict):
+def configure_hysteria_client(user_info: dict, proxy_config: dict):
     from base.config import PUBLIC_IP
 
     client_config = load_json(HYSTERIA_CLIENT_TEMPLATE_CONFIG_FILE)
 
-    client_config["server_name"] = cert_config["FAKE_SNI"]
+    client_config["server_name"] = proxy_config["SNI"]
     client_config["auth_str"] = user_info["password"]
 
     if proxy_config["OBFS"]:
@@ -57,9 +57,9 @@ def configure_hysteria_client(user_info: dict, proxy_config: dict, cert_config: 
     )
 
     if {proxy_config["OBFS"]}:
-        share_url = f"hysteria://{PUBLIC_IP}:8443/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}%20Hysteria"
+        share_url = f"hysteria://{PUBLIC_IP}:8443/?insecure=1&peer={proxy_config['SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}%20Hysteria"
     else:
-        share_url = f"hysteria://{PUBLIC_IP}:443/?insecure=1&peer={cert_config['FAKE_SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}#{user_info['name']}%20Hysteria"
+        share_url = f"hysteria://{PUBLIC_IP}:443/?insecure=1&peer={proxy_config['SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}#{user_info['name']}%20Hysteria"
 
     write_txt_file(
         share_url, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"

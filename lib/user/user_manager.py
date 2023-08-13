@@ -78,7 +78,7 @@ def gen_user_links_qrcodes(
 
     if rainb0w_config["XRAY"]["IS_ENABLED"]:
         configure_xray_reality_client(
-            user_info, rainb0w_config["XRAY"], rainb0w_config["CERT"]
+            user_info, rainb0w_config["XRAY"]
         )
         save_qrcode(
             load_txt_file(
@@ -89,7 +89,7 @@ def gen_user_links_qrcodes(
 
     if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
         configure_hysteria_client(
-            user_info, rainb0w_config["HYSTERIA"], rainb0w_config["CERT"]
+            user_info, rainb0w_config["HYSTERIA"]
         )
         save_qrcode(
             load_txt_file(
@@ -102,7 +102,6 @@ def gen_user_links_qrcodes(
         configure_mtproto_client(
             user_info,
             rainb0w_config["MTPROTO"],
-            rainb0w_config["CERT"],
             base64_encode=False,
         )
         save_qrcode(
@@ -216,7 +215,7 @@ If your client does not support share links, configure it as the following:
 Server:             {PUBLIC_IP}
 Port:               {rainb0w_config['HYSTERIA']['PORT']}
 Protocol:           UDP
-SNI:                {rainb0w_config['CERT']['FAKE_SNI']}
+SNI:                {rainb0w_config['HYSTERIA']['SNI']}
 ALPN:               {rainb0w_config['HYSTERIA']['ALPN']}
 Obfuscation:        {rainb0w_config['HYSTERIA']['OBFS']}
 Auth. Type:         BASE64

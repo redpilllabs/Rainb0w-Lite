@@ -30,7 +30,7 @@ from user.user_manager import (
     prompt_username,
     save_users,
 )
-from utils.cert_utils import prompt_fake_sni
+from utils.cert_utils import prompt_sni
 from utils.helper import (
     copy_file,
     gen_random_string,
@@ -47,7 +47,6 @@ def apply_config():
     if rainb0w_config["XRAY"]["IS_ENABLED"]:
         configure_xray_reality(
             rainb0w_config["XRAY"],
-            rainb0w_config["CERT"],
             XRAY_CONFIG_FILE,
         )
 
@@ -60,7 +59,6 @@ def apply_config():
     if rainb0w_config["MTPROTO"]["IS_ENABLED"]:
         configure_mtproto(
             rainb0w_config["MTPROTO"],
-            rainb0w_config["CERT"],
             MTPROTOPY_CONFIG_FILE,
         )
 
@@ -130,16 +128,18 @@ def configure():
     curr_step = 1
 
     progress_indicator(curr_step, total_steps, "Fake SNI")
-    rainb0w_config["CERT"]["FAKE_SNI"] = prompt_fake_sni()
+    proxy_sni = prompt_sni()
     curr_step += 1
 
     if "Xray REALITY" in selected:
         rainb0w_config["XRAY"]["IS_ENABLED"] = True
+        rainb0w_config["XRAY"]["SNI"] = proxy_sni
     else:
         remove_dir(f"{RAINB0W_HOME_DIR}/xray")
 
     if "MTProto" in selected:
         rainb0w_config["MTPROTO"]["IS_ENABLED"] = True
+        rainb0w_config["MTPROTO"]["SNI"] = proxy_sni
         if "Xray REALITY" in selected:
             progress_indicator(curr_step, total_steps, "MTProto Extra Port")
             rainb0w_config["MTPROTO"]["EXTRA_PORT"] = prompt_extra_port_number(
@@ -169,6 +169,7 @@ def configure():
             )
 
         rainb0w_config["HYSTERIA"]["ALPN"] = "h3"
+        rainb0w_config["HYSTERIA"]["SNI"] = proxy_sni
         rainb0w_config["HYSTERIA"]["IS_ENABLED"] = True
         curr_step += 1
     else:

@@ -17,10 +17,6 @@ source $PWD/lib/shell/os/rebuild_xt_geoip_db.sh
 # Setup firewall with necessary protections
 source $PWD/lib/shell/access_control/setup_firewall.sh
 
-# Allow outbound connections to the network hosting the selected SNI
-FAKE_SNI=$(python3 $PWD/lib/shell/helper/get_cert_info.py)
-source $PWD/lib/shell/access_control/allow_sni_subnet.sh $FAKE_SNI
-
 # Check if user selected proxies that need DNS support
 python3 $PWD/lib/shell/helper/get_proxy_status.py "blocky"
 PYTHON_EXIT_CODE=$?
@@ -33,6 +29,8 @@ fi
 python3 $PWD/lib/shell/helper/get_proxy_status.py "xray"
 PYTHON_EXIT_CODE=$?
 if [ $PYTHON_EXIT_CODE -ne 0 ]; then
+    xray_sni=$(python3 $PWD/lib/shell/helper/get_cert_info.py XRAY)
+    source $PWD/lib/shell/access_control/allow_sni_subnet.sh $xray_sni
     source $PWD/lib/shell/access_control/allow_port_xray.sh
     fn_restart_docker_container "xray"
     REALITY_ENABLED=true
@@ -52,10 +50,10 @@ PYTHON_EXIT_CODE=$?
 if [ $PYTHON_EXIT_CODE -ne 0 ]; then
     hysteria_mode=$(python3 $PWD/lib/shell/helper/get_hysteria_mode.py)
     source $PWD/lib/shell/access_control/allow_port_hysteria.sh "$hysteria_mode"
+    hysteria_sni=$(python3 $PWD/lib/shell/helper/get_cert_info.py HYSTERIA)
 
     # Generate a self-signed x509 certificate for Hysteria
-    output=$(python3 $PWD/lib/shell/helper/get_cert_info.py)
-    common_name=$(echo $output | awk -F'[ :]' '{print $1}')
+    common_name=$(echo $hysteria_sni | awk -F'[ :]' '{print $1}')
     source $PWD/lib/shell/cryptography/gen_x509_cert.sh ${common_name}
 
     # Add cronjob to renew the cert once a year

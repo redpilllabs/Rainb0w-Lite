@@ -14,14 +14,13 @@ from utils.helper import (
 
 def configure_mtproto(
     proxy_config: dict,
-    cert_config: dict,
     mtproto_config_file: str,
 ):
     print("Configuring MTProto...")
     mtproto_config = load_toml(mtproto_config_file)
 
-    mtproto_config["mtproto"]["mask_host"] = cert_config["FAKE_SNI"]
-    mtproto_config["mtproto"]["sni"] = cert_config["FAKE_SNI"]
+    mtproto_config["mtproto"]["mask_host"] = proxy_config['SNI']
+    mtproto_config["mtproto"]["sni"] = proxy_config['SNI']
     mtproto_config["server"]["port"] = proxy_config["PORT"]
     if proxy_config["AD_TAG"]:
         mtproto_config["mtproto"]["ad_tag"] = proxy_config["AD_TAG"]
@@ -33,7 +32,6 @@ def configure_mtproto(
 def configure_mtproto_client(
     user_info: dict,
     proxy_config: dict,
-    cert_config: dict,
     base64_encode=False,
 ):
     from base.config import PUBLIC_IP
@@ -47,7 +45,7 @@ def configure_mtproto_client(
         "https://t.me/" + "proxy?server=" + PUBLIC_IP + f"&port={port}" + "&secret="
     )
     tls_bytes = (
-        bytes.fromhex("ee" + user_info["secret"]) + cert_config["FAKE_SNI"].encode()
+        bytes.fromhex("ee" + user_info["secret"]) + proxy_config['SNI'].encode()
     )
 
     if base64_encode:

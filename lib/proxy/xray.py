@@ -38,7 +38,6 @@ def xray_remove_user(user_info: dict, xray_config_file: str):
 
 def configure_xray_reality(
     proxy_config: dict,
-    cert_config: dict,
     xray_config_file: str,
 ):
     print("Configuring Xray...")
@@ -50,22 +49,22 @@ def configure_xray_reality(
 
     xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
         "dest"
-    ] = f"{cert_config['FAKE_SNI']}:443"
+    ] = f"{proxy_config['SNI']}:443"
 
     xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
         "serverNames"
-    ].append(cert_config["FAKE_SNI"])
+    ].append(proxy_config['SNI'])
 
-    if not is_subdomain(cert_config["FAKE_SNI"]):
+    if not is_subdomain(proxy_config['SNI']):
         xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
             "serverNames"
-        ].append(f"www.{cert_config['FAKE_SNI']}")
+        ].append(f"www.{proxy_config['SNI']}")
 
     save_json(xray_config, xray_config_file)
 
 
 def configure_xray_reality_client(
-    user_info: dict, proxy_config: dict, cert_config: dict
+    user_info: dict, proxy_config: dict
 ):
     client_config = load_json(XRAY_CLIENT_TEMPLATE_CONFIG_FILE)
 
@@ -82,7 +81,7 @@ def configure_xray_reality_client(
     ]
     client_config["outbounds"][0]["streamSettings"]["realitySettings"][
         "serverName"
-    ] = cert_config["FAKE_SNI"]
+    ] = proxy_config['SNI']
     client_config["outbounds"][0]["streamSettings"]["realitySettings"][
         "publicKey"
     ] = proxy_config["PUBLIC_KEY"]
@@ -90,7 +89,7 @@ def configure_xray_reality_client(
         "shortId"
     ] = user_info["short_id"]
 
-    share_url = f"vless://{user_info['uuid']}@{PUBLIC_IP}:{proxy_config['PORT']}?security=reality&encryption=none&pbk={proxy_config['PUBLIC_KEY']}&headerType=none&fp=chrome&spx=%2F&type=tcp&flow=xtls-rprx-vision&sni={cert_config['FAKE_SNI']}&sid={user_info['short_id']}#{user_info['name']}%20REALITY"
+    share_url = f"vless://{user_info['uuid']}@{PUBLIC_IP}:{proxy_config['PORT']}?security=reality&encryption=none&pbk={proxy_config['PUBLIC_KEY']}&headerType=none&fp=chrome&spx=%2F&type=tcp&flow=xtls-rprx-vision&sni={proxy_config['SNI']}&sid={user_info['short_id']}#{user_info['name']}%20REALITY"
     write_txt_file(
         share_url, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-url.txt"
     )

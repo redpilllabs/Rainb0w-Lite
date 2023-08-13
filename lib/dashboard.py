@@ -35,7 +35,7 @@ from user.user_manager import (
     save_users,
 )
 from utils.ac_utils import is_porn_blocked
-from utils.cert_utils import get_current_sni, prompt_fake_sni
+from utils.cert_utils import prompt_sni
 from utils.helper import (
     clear_screen,
     copy_dir,
@@ -54,30 +54,25 @@ def sni_menu():
 
     title = "Select any option:"
     options = [
-        "View Currently Set SNI",
-        "Change SNI",
+        "Change REALITY/Hysteria SNI",
+        "Change MTProto SNI",
         "Back to Main Menu",
     ]
     option, _ = pick(options, title)
-    if option == "View Currently Set SNI":
-        clear_screen()
-        sni = get_current_sni(RAINB0W_CONFIG_FILE)
-        print(f"Current SNI: {sni}")
-        prompt_clear_screen()
-    elif option == "Change SNI":
+    if option == "Change REALITY/Hysteria SNI":
         clear_screen()
         rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
-        rainb0w_config["CERT"]["FAKE_SNI"] = prompt_fake_sni()
-        print("Resetting the new SNI on proxies")
+        proxy_sni = prompt_sni("REALITY/Hysteria")
+        print("Resetting the new SNI on REALITY and Hysteria")
         if rainb0w_config["XRAY"]["IS_ENABLED"]:
-            reset_xray_sni(rainb0w_config["CERT"]["FAKE_SNI"], XRAY_CONFIG_FILE)
-        if rainb0w_config["MTPROTO"]["IS_ENABLED"]:
-            reset_mtproto_sni(rainb0w_config["CERT"]["FAKE_SNI"], MTPROTOPY_CONFIG_FILE)
+            rainb0w_config["XRAY"]["SNI"] = proxy_sni
+            reset_xray_sni(proxy_sni, XRAY_CONFIG_FILE)
         if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
+            rainb0w_config["HYSTERIA"]["SNI"] = proxy_sni
             run_system_cmd(
                 [
                     f"{os.getcwd()}/lib/shell/cryptography/gen_x509_cert.sh",
-                    rainb0w_config["CERT"]["FAKE_SNI"],
+                    proxy_sni,
                 ]
             )
             with FileInput(
@@ -85,7 +80,7 @@ def sni_menu():
             ) as file:
                 for line in file:
                     if line.startswith("COMMON_NAME="):
-                        line = f"COMMON_NAME={rainb0w_config['CERT']['FAKE_SNI']}"
+                        line = f"COMMON_NAME={proxy_sni}"
                     print(line, end="")
 
         save_toml(rainb0w_config, RAINB0W_CONFIG_FILE)
@@ -111,7 +106,7 @@ def sni_menu():
         run_system_cmd(
                 [
                     f"{os.getcwd()}/lib/shell/access_control/allow_sni_subnet.sh",
-                    rainb0w_config["CERT"]["FAKE_SNI"],
+                    proxy_sni,
                 ]
             )
 
@@ -121,6 +116,32 @@ def sni_menu():
             "Changes only take effect after selecting 'Apply Changes' in the dashboard!"
         )
         prompt_clear_screen()
+    elif option == "Change MTProto SNI":
+        clear_screen()
+        rainb0w_config = load_toml(RAINB0W_CONFIG_FILE)
+        proxy_sni = prompt_sni("MTProto")
+        print("Resetting the new SNI on MTProto")
+        if rainb0w_config["MTPROTO"]["IS_ENABLED"]:
+            rainb0w_config["MTPROTO"]["SNI"] = proxy_sni
+            reset_mtproto_sni(proxy_sni, MTPROTOPY_CONFIG_FILE)
+            save_toml(rainb0w_config, RAINB0W_CONFIG_FILE)
+            # Regenerate user links and QR codes with the new SNI
+            print("Regenerating user share links and QR codes")
+            rainb0w_users = get_users(RAINB0W_USERS_FILE)
+            if rainb0w_users:
+                for user in rainb0w_users:
+                    gen_user_links_qrcodes(user, RAINB0W_CONFIG_FILE)
+
+            NEED_SERVICE_RESTART = True
+            print(
+                "Changes only take effect after selecting 'Apply Changes' in the dashboard!"
+            )
+            prompt_clear_screen()
+        else:
+            print(
+                "MTProto is not enabled. You need to enable MTProto during installation before changing the SNI."
+            )
+            prompt_clear_screen()
     dashboard()
 
 
