@@ -25,7 +25,7 @@ else
             exit 0
         fi
     elif [[ "$DISTRO" =~ "Debian GNU/Linux" ]]; then
-        if [ ! "$DISTRO_VERSION" == "11" ]; then
+        if [ ! "$DISTRO_VERSION" == "11" ] && [ ! "$DISTRO_VERSION" == "12" ]; then
             echo "Your version of Debian is not supported! Minimum required version is 11"
             exit 0
         else
@@ -34,8 +34,9 @@ else
             # we need to upgrade to the latest kernel available on the repository first
             apt update
             current_kernel=$(uname -r)
-            latest_kernel=$(apt-cache search linux-image | grep -oP '5\.10\.[0-9]+-[0-9]+' | uniq | sort --version-sort | tail -n 1)
-            if [[ "$latest_kernel" > "$current_kernel" ]]; then
+            current_kernel="${current_kernel%-amd64}"
+            latest_kernel=$(apt-cache search linux-image | grep -oP '[0-9]+\.[0-9]+\.[0-9]+-[0-9]+' | uniq | sort --version-sort | tail -n 1)
+            if [[ $(echo -e "$current_kernel\n$latest_kernel" | sort -V | head -n 1) < "$latest_kernel" ]]; then
                 fn_check_and_install_pkg linux-image-$latest_kernel-amd64
                 fn_check_and_install_pkg linux-headers-$latest_kernel-amd64
                 echo -e "${B_GREEN}\n\nA newer kernel '$latest_kernel' is installed on your Debian.${RESET}"
@@ -68,6 +69,8 @@ if [ ! -d "$HOME/Rainb0w_Lite_Home" ]; then
     fi
     # Install required packages
     fn_install_required_packages
+    # Initialize and activate the Python virtual env
+    fn_activate_python_venv
     # Install xtables geoip
     source $PWD/lib/shell/os/install_xt_geoip.sh
     # Install Docker
@@ -142,6 +145,7 @@ Choose an option: "
 function main() {
     if [ -d "$HOME/Rainb0w_Lite_Home" ]; then
         # We have an existing installation, so let's present the dashboard to change settings
+        fn_activate_python_venv
         python3 $PWD/lib/dashboard.py
         PYTHON_EXIT_CODE=$?
         if [ $PYTHON_EXIT_CODE -eq 1 ]; then
