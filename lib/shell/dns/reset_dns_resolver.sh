@@ -12,6 +12,7 @@ if systemctl is-active --quiet systemd-resolved; then
         rm /etc/systemd/resolved.conf.d/nostublistener.conf
     fi
     systemctl reload-or-restart systemd-resolved
+    sleep 5
 else
     if [ -f "/etc/resolvconf/resolv.conf.d/head" ]; then
         echo "" | tee /etc/resolvconf/resolv.conf.d/head

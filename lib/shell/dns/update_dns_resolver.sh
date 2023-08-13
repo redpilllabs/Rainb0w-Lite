@@ -19,7 +19,7 @@ if systemctl is-active --quiet systemd-resolved; then
         mv /etc/resolv.conf /etc/resolv.conf.backup
         ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
         systemctl reload-or-restart systemd-resolved
-        sleep 2
+        sleep 5
     fi
 else
     fn_check_and_install_pkg resolvconf
