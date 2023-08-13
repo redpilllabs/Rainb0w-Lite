@@ -12,9 +12,6 @@ if [ "$IS_PKG_INSTALLED" = false ] || [ ! -d "/usr/libexec/rainb0w" ]; then
     fn_check_and_install_pkg iptables-persistent
     fn_check_and_install_pkg cron
 
-    # Build the IP database
-    source $PWD/lib/shell/os/rebuild_xt_geoip_db.sh
-
     # Rotate kernel logs and limit them to max 100MB
     source $PWD/lib/shell/os/enable_kernel_logrotate.sh
 
@@ -23,6 +20,14 @@ if [ "$IS_PKG_INSTALLED" = false ] || [ ! -d "/usr/libexec/rainb0w" ]; then
     if [ ! -f "/etc/crontab" ]; then
         touch /etc/crontab
     fi
+
+    if [ ! -d "/usr/libexec/rainb0w/" ]; then
+        mkdir -p /usr/libexec/rainb0w
+    fi
+    if [ ! -d "/usr/share/xt_geoip" ]; then
+        mkdir -p /usr/share/xt_geoip
+    fi
+
     if ! crontab -l | grep -q "0 1 * * * root bash /usr/libexec/rainb0w/xt_geoip_update.sh >/tmp/xt_geoip_update.log"; then
         echo -e "${B_GREEN}>> Adding cronjob to update xt_goip database \n  ${RESET}"
         cp $PWD/lib/shell/cronjobs/xt_geoip_update.sh /usr/libexec/rainb0w/xt_geoip_update.sh

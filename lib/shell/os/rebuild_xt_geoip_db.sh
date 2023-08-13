@@ -44,5 +44,5 @@ if [ "$(fn_check_for_pkg xtables-addons-common)" = true ] &&
         lsmod | grep ^xt_geoip
     fi
 else
-    fn_install_xt_geoip_module
+    source $PWD/lib/shell/os/install_xt_geoip.sh
 fi

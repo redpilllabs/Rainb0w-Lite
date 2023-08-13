@@ -10,6 +10,10 @@ source $PWD/lib/shell/docker/init_vol_net.sh
 
 # Apply Kernel's network stack optimizations
 source $PWD/lib/shell/performance/tune_kernel_net.sh
+
+# Build the GeoIP database
+source $PWD/lib/shell/os/rebuild_xt_geoip_db.sh
+
 # Setup firewall with necessary protections
 source $PWD/lib/shell/access_control/setup_firewall.sh
 
