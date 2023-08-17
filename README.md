@@ -34,7 +34,7 @@
 
 - یک سرور مجازی لینوکس با مشخصات حداقلی زیر
 
-  - OS: Debian 11 or Ubuntu 20.04, 22.04
+  - OS: Debian 11, 12 or Ubuntu 20.04, 22.04
   - Memory: 256MB
   - Storage: 5GB NVME or SSD
   - Virtualization: KVM (OpenVZ and NAT servers are not supported)
@@ -44,8 +44,7 @@
 ```
 apt install git
 git clone https://github.com/redpilllabs/Rainb0w-Lite.git
-cd Rainb0w-Lite
-./run.sh
+cd Rainb0w-Lite && ./run.sh
 ```
 
 برای راهنمای تصویری نصب به قسمت [ویکی](https://github.com/redpilllabs/Rainb0w-Lite/wiki) پروژه مراجعه نمایید.
