@@ -4,8 +4,6 @@ from os import urandom
 from random import randint
 from uuid import uuid4
 
-from rich import print
-
 from base.config import CLIENT_CONFIG_FILES_DIR, PUBLIC_IP
 from proxy.hysteria import (
     configure_hysteria_client,
@@ -14,13 +12,16 @@ from proxy.hysteria import (
 )
 from proxy.mtproto import configure_mtproto_client
 from proxy.xray import configure_xray_reality_client, xray_add_user, xray_remove_user
+from rich import print
 from utils.helper import (
     gen_qrcode,
     gen_random_string,
+    load_json,
     load_toml,
     load_txt_file,
     print_txt_file,
     remove_dir,
+    save_json,
     save_qrcode,
     save_toml,
 )
@@ -75,9 +76,7 @@ def gen_user_links_qrcodes(
         os.makedirs(f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}")
 
     if rainb0w_config["XRAY"]["IS_ENABLED"]:
-        configure_xray_reality_client(
-            user_info, rainb0w_config["XRAY"]
-        )
+        configure_xray_reality_client(user_info, rainb0w_config["XRAY"])
         save_qrcode(
             load_txt_file(
                 f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/reality-url.txt"
@@ -86,9 +85,7 @@ def gen_user_links_qrcodes(
         )
 
     if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
-        configure_hysteria_client(
-            user_info, rainb0w_config["HYSTERIA"]
-        )
+        configure_hysteria_client(user_info, rainb0w_config["HYSTERIA"])
         save_qrcode(
             load_txt_file(
                 f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"
@@ -152,21 +149,58 @@ def remove_user(
                 save_users(rainb0w_users, rainb0w_users_file)
 
 
-def reset_user_credentials(username: str, rainb0w_users_file: str):
+def reset_user_credentials(
+    username: str,
+    rainb0w_users_file: str,
+    rainb0w_config_file: str,
+    xray_config_file: str,
+    hysteria_config_file: str,
+):
     rainb0w_users = get_users(rainb0w_users_file)
+    rainb0w_config = load_toml(rainb0w_config_file)
+    xray_config = load_json(xray_config_file)
+    hysteria_config = load_json(hysteria_config_file)
     if rainb0w_users:
         for user in rainb0w_users:
             if user["name"] == username:
                 print(
-                            f"Resetting UUID, shortID, password, and sercrets for '{username}'..."
-                        )
-                user["password"] = gen_random_string(randint(8, 12))
-                user["uuid"] = str(uuid4())
-                user["short_id"] = "".join(
+                    f"Resetting UUID, shortID, password, and sercrets for '{username}'..."
+                )
+                new_password = gen_random_string(randint(8, 12))
+                new_uuid = str(uuid4())
+                new_short_id = "".join(
                     random.choice("0123456789abcdef") for _ in range(8)
                 )
-                user["secret"] = urandom(16).hex()
+                new_secret = urandom(16).hex()
+
+                if rainb0w_config["XRAY"]["IS_ENABLED"]:
+                    for client in xray_config["inbounds"][0]["settings"]["clients"]:
+                        if "id" in client:
+                            if client["id"] == user["uuid"]:
+                                client["id"] = new_uuid
+
+                    xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
+                        "shortIds"
+                    ] = [
+                        new_short_id if item == user["short_id"] else item
+                        for item in xray_config["inbounds"][0]["streamSettings"][
+                            "realitySettings"
+                        ]["shortIds"]
+                    ]
+
+                if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
+                    hysteria_config["auth"]["config"] = [
+                        new_password if item == user["password"] else item
+                        for item in hysteria_config["auth"]["config"]
+                    ]
+
+                user["password"] = new_password
+                user["uuid"] = new_uuid
+                user["short_id"] = new_short_id
+                user["secret"] = new_secret
                 save_users(rainb0w_users, rainb0w_users_file)
+                save_json(xray_config, xray_config_file)
+                save_json(hysteria_config, hysteria_config_file)
 
 
 def print_client_info(username: str, rainb0w_users_file: str, rainb0w_config_file: str):

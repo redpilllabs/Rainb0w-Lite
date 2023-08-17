@@ -4,10 +4,13 @@
 import os
 import re
 import signal
-from fileinput import FileInput
 import sys
+from fileinput import FileInput
 from time import sleep
 from typing import List
+
+from pick import pick
+from rich import print
 
 from base.config import (
     BLOCKY_CONFIG_FILE,
@@ -19,11 +22,9 @@ from base.config import (
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
 )
-from pick import pick
 from proxy.blocky import disable_porn_dns_blocking, enable_porn_dns_blocking
 from proxy.mtproto import change_mtproto_adtag, prompt_mtproto_adtag, reset_mtproto_sni
 from proxy.xray import reset_xray_sni
-from rich import print
 from user.user_manager import (
     add_user_to_proxies,
     create_new_user,
@@ -92,18 +93,13 @@ def sni_menu():
                 gen_user_links_qrcodes(user, RAINB0W_CONFIG_FILE)
 
         print("Applying firewall settings")
+        run_system_cmd([f"{os.getcwd()}/lib/shell/access_control/remove_sni_subnet.sh"])
         run_system_cmd(
-                [
-                    f"{os.getcwd()}/lib/shell/access_control/remove_sni_subnet.sh"
-                ]
-            )
-        run_system_cmd(
-                [
-                    f"{os.getcwd()}/lib/shell/access_control/allow_sni_subnet.sh",
-                    proxy_sni,
-                ]
-            )
-
+            [
+                f"{os.getcwd()}/lib/shell/access_control/allow_sni_subnet.sh",
+                proxy_sni,
+            ]
+        )
 
         NEED_SERVICE_RESTART = True
         print(
@@ -238,7 +234,13 @@ def user_info_menu(username: str):
             if rainb0w_users:
                 for user in rainb0w_users:
                     if user["name"] == username:
-                        reset_user_credentials(username, RAINB0W_USERS_FILE)
+                        reset_user_credentials(
+                            username,
+                            RAINB0W_USERS_FILE,
+                            RAINB0W_CONFIG_FILE,
+                            XRAY_CONFIG_FILE,
+                            HYSTERIA_CONFIG_FILE,
+                        )
                         gen_user_links_qrcodes(user, RAINB0W_CONFIG_FILE)
                         print(
                             "Credentials reset. You can view the new links and QR codes already but changes only take effect after selecting 'Apply Changes' in the dashboard!"
@@ -403,9 +405,11 @@ def dashboard():
         print("Exiting!")
         exit(0)
 
+
 def signal_handler(sig, frame):
     print("\nOkay! Exiting!")
     sys.exit(1)
+
 
 if __name__ == "__main__":
     # Enable bailing out!
