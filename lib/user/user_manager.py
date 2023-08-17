@@ -157,7 +157,9 @@ def reset_user_credentials(username: str, rainb0w_users_file: str):
     if rainb0w_users:
         for user in rainb0w_users:
             if user["name"] == username:
-                print(f"Resetting the user credentials for '{username}'...")
+                print(
+                            f"Resetting UUID, shortID, password, and sercrets for '{username}'..."
+                        )
                 user["password"] = gen_random_string(randint(8, 12))
                 user["uuid"] = str(uuid4())
                 user["short_id"] = "".join(

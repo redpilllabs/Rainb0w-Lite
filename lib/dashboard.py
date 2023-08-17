@@ -238,9 +238,6 @@ def user_info_menu(username: str):
             if rainb0w_users:
                 for user in rainb0w_users:
                     if user["name"] == username:
-                        print(
-                            f"Resetting UUID, shortID, password, and sercrets for {username}!"
-                        )
                         reset_user_credentials(username, RAINB0W_USERS_FILE)
                         gen_user_links_qrcodes(user, RAINB0W_CONFIG_FILE)
                         print(
