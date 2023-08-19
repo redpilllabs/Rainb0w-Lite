@@ -1,4 +1,5 @@
 #!/bin/bash
+source $PWD/lib/shell/base/colors.sh
 
 echo -e "${B_GREEN}>> Generating a self-signed certificate${RESET}"
 openssl req -newkey rsa:2048 \

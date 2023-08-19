@@ -1,4 +1,5 @@
 #!/bin/bash
+source $PWD/lib/shell/base/colors.sh
 
 function fn_gen_insert_x25519_keys() {
     if [ ! -f "/tmp/Xray/xray" ]; then
