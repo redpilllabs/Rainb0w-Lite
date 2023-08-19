@@ -4,6 +4,8 @@ from os import urandom
 from random import randint
 from uuid import uuid4
 
+from rich import print
+
 from base.config import CLIENT_CONFIG_FILES_DIR, PUBLIC_IP
 from proxy.hysteria import (
     configure_hysteria_client,
@@ -12,7 +14,6 @@ from proxy.hysteria import (
 )
 from proxy.mtproto import configure_mtproto_client
 from proxy.xray import configure_xray_reality_client, xray_add_user, xray_remove_user
-from rich import print
 from utils.helper import (
     gen_qrcode,
     gen_random_string,
@@ -164,7 +165,7 @@ def reset_user_credentials(
         for user in rainb0w_users:
             if user["name"] == username:
                 print(
-                    f"Resetting UUID, shortID, password, and sercrets for '{username}'..."
+                    f"Resetting UUID, shortID, password, and secrets for '{username}'..."
                 )
                 new_password = gen_random_string(randint(8, 12))
                 new_uuid = str(uuid4())
