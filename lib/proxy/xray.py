@@ -53,9 +53,9 @@ def configure_xray_reality(
 
     xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
         "serverNames"
-    ].append(proxy_config['SNI'])
+    ].append(proxy_config["SNI"])
 
-    if not is_subdomain(proxy_config['SNI']):
+    if not is_subdomain(proxy_config["SNI"]):
         xray_config["inbounds"][0]["streamSettings"]["realitySettings"][
             "serverNames"
         ].append(f"www.{proxy_config['SNI']}")
@@ -63,9 +63,7 @@ def configure_xray_reality(
     save_json(xray_config, xray_config_file)
 
 
-def configure_xray_reality_client(
-    user_info: dict, proxy_config: dict
-):
+def configure_xray_reality_client(user_info: dict, proxy_config: dict):
     client_config = load_json(XRAY_CLIENT_TEMPLATE_CONFIG_FILE)
 
     client_config["outbounds"][0]["settings"]["vnext"][0]["address"] = PUBLIC_IP
@@ -76,12 +74,12 @@ def configure_xray_reality_client(
         {
             "id": user_info["uuid"],
             "encryption": "none",
-            "flow": "xtls-rprx-vision-udp443",
+            "flow": "xtls-rprx-vision",
         }
     ]
     client_config["outbounds"][0]["streamSettings"]["realitySettings"][
         "serverName"
-    ] = proxy_config['SNI']
+    ] = proxy_config["SNI"]
     client_config["outbounds"][0]["streamSettings"]["realitySettings"][
         "publicKey"
     ] = proxy_config["PUBLIC_KEY"]
