@@ -1,8 +1,12 @@
 # Changelog
 
+## Version 1.9.3
+
+- Add support for Hysteria 2
+
 ## Version 1.9.2
 
-- Fix Hysteria to use version 1.3.5 to avoid compatbility issues with version 2.x
+- Fix Hysteria to use version 1.3.5 to avoid compatibility issues with version 2.x
 
 ## Version 1.9.1
 
