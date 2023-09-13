@@ -1,6 +1,6 @@
 
 from base.config import CLIENT_CONFIG_FILES_DIR, HYSTERIA_CLIENT_TEMPLATE_CONFIG_FILE
-from utils.helper import load_json, save_json, write_txt_file
+from utils.helper import gen_random_string, load_yaml, save_yaml, write_txt_file
 
 
 def configure_hysteria(
@@ -8,58 +8,59 @@ def configure_hysteria(
     hysteria_config_file: str,
 ):
     print("Configuring Hysteria...")
-    hysteria_config = load_json(hysteria_config_file)
+    hysteria_config = load_yaml(hysteria_config_file)
 
-    hysteria_config["listen"] = f":{proxy_config['PORT']}"
+    hysteria_config["masquerade"]["proxy"]["url"] = f"https://{proxy_config['SNI']}"
+    hysteria_config["auth"]["password"] = gen_random_string(16) # Random unused password just to satisfy config, actual user pass entries are inserted later on
     if proxy_config["OBFS"]:
-        hysteria_config["obfs"] = proxy_config["OBFS"]
-    if proxy_config["ALPN"]:
-        hysteria_config["alpn"] = proxy_config["ALPN"]
+        hysteria_config['obfs'] = {'type': 'salamander', 'salamander': {'password': proxy_config["OBFS"]}}
 
-    save_json(hysteria_config, hysteria_config_file)
+    save_yaml(hysteria_config, hysteria_config_file)
 
 
 def hysteria_add_user(user_info: dict, hysteria_config_file: str):
-    hysteria_config = load_json(hysteria_config_file)
-    hysteria_config["auth"]["config"].append(user_info["password"])
+    hysteria_config = load_yaml(hysteria_config_file)
+    if hysteria_config['auth']['userpass']:
+        hysteria_config['auth']['userpass'][user_info["name"]] = user_info["password"]
+    else:
+        hysteria_config['auth']['userpass'] = {user_info["name"]: user_info["password"]}
 
-    save_json(hysteria_config, hysteria_config_file)
+    save_yaml(hysteria_config, hysteria_config_file)
 
 
 def hysteria_remove_user(user_info: dict, hysteria_config_file: str):
-    hysteria_config = load_json(hysteria_config_file)
-    for item in hysteria_config["auth"]["config"]:
-        if item == user_info["password"]:
-            hysteria_config["auth"]["config"].remove(item)
+    hysteria_config = load_yaml(hysteria_config_file)
+    user_found = hysteria_config["auth"]['userpass'].get(user_info["name"])
+    if user_found:
+        del hysteria_config["auth"]['userpass'][user_info["name"]]
 
-    save_json(hysteria_config, hysteria_config_file)
+    save_yaml(hysteria_config, hysteria_config_file)
 
 
 def configure_hysteria_client(user_info: dict, proxy_config: dict):
     from base.config import PUBLIC_IP
 
-    client_config = load_json(HYSTERIA_CLIENT_TEMPLATE_CONFIG_FILE)
+    client_config = load_yaml(HYSTERIA_CLIENT_TEMPLATE_CONFIG_FILE)
 
-    client_config["server_name"] = proxy_config["SNI"]
-    client_config["auth_str"] = user_info["password"]
+    client_config["server"] = client_config["server"].replace("USERNAME", user_info["name"])
+    client_config["server"] = client_config["server"].replace("PASSWORD", user_info["password"])
+    client_config["server"] = client_config["server"].replace("YOUR_SNI", proxy_config["SNI"])
 
     if proxy_config["OBFS"]:
-        client_config["server"] = f"{PUBLIC_IP}:8443"
-        client_config["obfs"] = proxy_config["OBFS"]
+        client_config["server"] = client_config["server"].replace("PUBLIC_IP", f"{PUBLIC_IP}:8443")
+        client_config["server"] +=  "&obfs=salamander"
+        client_config["server"] +=  f"&obfs-password={proxy_config['OBFS']}"
     else:
-        client_config["server"] = f"{PUBLIC_IP}:443"
+        client_config["server"] = client_config["server"].replace("PUBLIC_IP", f"{PUBLIC_IP}")
 
-    if proxy_config["ALPN"]:
-        client_config["alpn"] = proxy_config["ALPN"]
-
-    save_json(
-        client_config, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria.json"
+    save_yaml(
+        client_config, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria.yml"
     )
 
     if {proxy_config["OBFS"]}:
-        share_url = f"hysteria://{PUBLIC_IP}:8443/?insecure=1&peer={proxy_config['SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}&obfs=xplus&obfsParam={proxy_config['OBFS']}#{user_info['name']}%20Hysteria"
+        share_url =f"hysteria2://{user_info['name']}:{user_info['password']}@{PUBLIC_IP}:8443/?insecure=1&obfs=salamander&obfs-password={proxy_config['OBFS']}&sni={proxy_config['SNI']}#{user_info['name']}%20Hysteria"
     else:
-        share_url = f"hysteria://{PUBLIC_IP}:443/?insecure=1&peer={proxy_config['SNI']}&auth={user_info['password']}&alpn={proxy_config['ALPN']}#{user_info['name']}%20Hysteria"
+        share_url =f"hysteria2://{user_info['name']}:{user_info['password']}@{PUBLIC_IP}:8443/?insecure=1&sni={proxy_config['SNI']}#{user_info['name']}%20Hysteria"
 
     write_txt_file(
         share_url, f"{CLIENT_CONFIG_FILES_DIR}/{user_info['name']}/hysteria-url.txt"

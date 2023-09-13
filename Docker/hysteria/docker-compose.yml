@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   hysteria:
-    image: tobyxdd/hysteria:v1.3.5
+    image: tobyxdd/hysteria:latest
     container_name: hysteria
     restart: always
     cap_add:
@@ -15,12 +15,12 @@ services:
       - /etc/ssl/certs/selfsigned.crt:/etc/ssl/certs/selfsigned.crt:ro
       - /etc/ssl/private/selfsigned.key:/etc/ssl/private/selfsigned.key:ro
       - /etc/localtime:/etc/localtime:ro
-      - ./etc/hysteria.json:/etc/hysteria.json
+      - ./etc/hysteria.yml:/etc/config.yml
     environment:
       - LOGGING_LEVEL=error
       - LOGGING_IPV4_MASK=24
       - LOGGING_IPV6_MASK=24
-    command: [ "server", "--config", "/etc/hysteria.json" ]
+    command: [ "server", "-c", "/etc/config.yml" ]
 
 networks:
   proxy:

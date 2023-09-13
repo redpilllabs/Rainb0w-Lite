@@ -1,6 +1,7 @@
 import os
 import random
 from os import urandom
+from os.path import exists
 from random import randint
 from uuid import uuid4
 
@@ -20,11 +21,13 @@ from utils.helper import (
     load_json,
     load_toml,
     load_txt_file,
+    load_yaml,
     print_txt_file,
     remove_dir,
     save_json,
     save_qrcode,
     save_toml,
+    save_yaml,
 )
 
 
@@ -159,8 +162,7 @@ def reset_user_credentials(
 ):
     rainb0w_users = get_users(rainb0w_users_file)
     rainb0w_config = load_toml(rainb0w_config_file)
-    xray_config = load_json(xray_config_file)
-    hysteria_config = load_json(hysteria_config_file)
+
     if rainb0w_users:
         for user in rainb0w_users:
             if user["name"] == username:
@@ -175,6 +177,7 @@ def reset_user_credentials(
                 new_secret = urandom(16).hex()
 
                 if rainb0w_config["XRAY"]["IS_ENABLED"]:
+                    xray_config = load_json(xray_config_file)
                     for client in xray_config["inbounds"][0]["settings"]["clients"]:
                         if "id" in client:
                             if client["id"] == user["uuid"]:
@@ -189,19 +192,22 @@ def reset_user_credentials(
                         ]["shortIds"]
                     ]
 
+                    save_json(xray_config, xray_config_file)
+
                 if rainb0w_config["HYSTERIA"]["IS_ENABLED"]:
-                    hysteria_config["auth"]["config"] = [
-                        new_password if item == user["password"] else item
-                        for item in hysteria_config["auth"]["config"]
-                    ]
+                    hysteria_config = load_yaml(hysteria_config_file)
+                    user_found = hysteria_config["auth"]['userpass'].get(user["name"])
+                    if user_found:
+                        hysteria_config["auth"]['userpass'][user["name"]] = new_password
+
+                    save_yaml(hysteria_config, hysteria_config_file)
 
                 user["password"] = new_password
                 user["uuid"] = new_uuid
                 user["short_id"] = new_short_id
                 user["secret"] = new_secret
                 save_users(rainb0w_users, rainb0w_users_file)
-                save_json(xray_config, xray_config_file)
-                save_json(hysteria_config, hysteria_config_file)
+
 
 
 def print_client_info(username: str, rainb0w_users_file: str, rainb0w_config_file: str):
@@ -247,19 +253,13 @@ def print_client_info(username: str, rainb0w_users_file: str, rainb0w_config_fil
                         f"""
 If your client does not support share links, configure it as the following:
 
+Protocol version:   2
 Server:             {PUBLIC_IP}
 Port:               {rainb0w_config['HYSTERIA']['PORT']}
-Protocol:           UDP
-SNI:                {rainb0w_config['HYSTERIA']['SNI']}
-ALPN:               {rainb0w_config['HYSTERIA']['ALPN']}
 Obfuscation:        {rainb0w_config['HYSTERIA']['OBFS']}
-Auth. Type:         STRING
-Payload:            {user["password"]}
+Authentication:     {user["name"]}:{user["password"]}
+SNI:                {rainb0w_config['HYSTERIA']['SNI']}
 Allow Insecure:     Enabled
-Max Upload:         YOUR REAL UPLOAD SPEED
-Max Download:       YOUR REAL DOWNLOAD SPEED
-QUIC Stream:        1677768
-QUIC Conn.:         4194304
 Disable Path MTU Discovery: Enabled
             """
                     )

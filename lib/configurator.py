@@ -5,6 +5,8 @@ import random
 import signal
 import sys
 
+from pick import pick
+
 from base.config import (
     HYSTERIA_CONFIG_FILE,
     MTPROTOPY_CONFIG_FILE,
@@ -14,7 +16,6 @@ from base.config import (
     RAINB0W_USERS_FILE,
     XRAY_CONFIG_FILE,
 )
-from pick import pick
 from proxy.hysteria import configure_hysteria
 from proxy.mtproto import (
     change_mtproto_adtag,
@@ -159,16 +160,15 @@ def configure():
     if "Hysteria" in selected:
         progress_indicator(curr_step, total_steps, "Hysteria Mode")
         title = "Select Hysteria running mode:"
-        options = ["Raw Obfuscated UDP [Recommended]", "Normal QUIC"]
+        options = ["Obfuscated UDP [Recommended]", "Pure QUIC/HTTP3"]
 
         option, _ = pick(options, title)
-        if option == "Raw Obfuscated UDP [Recommended]":
+        if option == "Obfuscated UDP [Recommended]":
             # Port will be set to 8443
             rainb0w_config["HYSTERIA"]["OBFS"] = gen_random_string(
                 random.randint(8, 12)
             )
 
-        rainb0w_config["HYSTERIA"]["ALPN"] = "h3"
         rainb0w_config["HYSTERIA"]["SNI"] = proxy_sni
         rainb0w_config["HYSTERIA"]["IS_ENABLED"] = True
         curr_step += 1

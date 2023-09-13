@@ -16,7 +16,6 @@ SNI = ""
 [HYSTERIA]
 IS_ENABLED = false
 PORT = 8443        # UDP. Will use 443 when obfs is blank
-ALPN = ""
 OBFS = ""
 SNI = ""
 
