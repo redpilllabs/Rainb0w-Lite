@@ -9,7 +9,7 @@
 ### 🚀 پروکسی
 
 - VLESS REALITY [TCP]
-- Hysteria [UDP]
+- Hysteria 2 [UDP]
 - MTProto
 
 ### 🔑 امنیت و دسترسی
