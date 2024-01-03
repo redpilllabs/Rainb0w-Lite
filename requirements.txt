@@ -1,0 +1,8 @@
+pick
+toml
+rich
+python-dotenv
+psutil
+bcrypt
+requests
+pyyaml

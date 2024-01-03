@@ -1,0 +1,21 @@
+server: hysteria2://USERNAME:PASSWORD@PUBLIC_IP/?insecure=1&sni=YOUR_SNI
+
+quic:
+  disablePathMTUDiscovery: true
+
+acl:
+  inline:
+    - reject(geoip:cn)
+    - reject(geoip:ir)
+    - reject(all, tcp/25)
+    - reject(10.0.0.0/8)
+    - reject(172.16.0.0/12)
+    - reject(192.168.0.0/16)
+    - reject(fc00::/7)
+    - direct(all)
+
+socks5:
+  listen: 127.0.0.1:1080
+
+http:
+  listen: 127.0.0.1:3128

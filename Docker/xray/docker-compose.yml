@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  xray:
+    image: teddysun/xray:latest
+    container_name: xray
+    restart: always
+    networks:
+      - proxy
+    ports:
+      - 443:443
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./etc/xray.json:/etc/xray/config.json:ro
+    command: "xray run --config /etc/xray/config.json"
+
+networks:
+  proxy:
+    external: true
